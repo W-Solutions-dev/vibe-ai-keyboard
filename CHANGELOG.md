@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-01-21
+
+### Added
+- PROJECT_HISTORY.md documenting the complete development journey
+- Development history tracking requirements in .cursorrules
+- Acknowledgment of ~500 Claude Opus requests in README
+
+### Fixed
+- Removed automatic trailing space after recognized text
+
+### Changed
+- Updated vibe coding note to reflect the collaborative effort
+
 ## [0.2.0] - 2025-01-21
 
 ### Added
