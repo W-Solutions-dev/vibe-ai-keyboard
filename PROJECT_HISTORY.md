@@ -580,6 +580,13 @@ This update reinforces the project's core value of absolute privacy while expand
 - Renamed issue templates to follow GitHub naming conventions (hyphenated lowercase)
 - Added privacy documentation maintenance requirements to cursor rules
 
+## 2025-06-01: Missing Spaces Between Sentences
+- **User Report**: "there seems to be no spaces in between every sentence ending and beginning of a new one"
+- **Issue**: When dictating multiple sentences, they were being concatenated without spaces (e.g., "Thank you.Well, let us test.")
+- **Solution**: Added logic to track last typed text and automatically insert a space before new text when the previous text ended with punctuation or alphanumeric characters
+- **Implementation**: Applied fix across all speech keyboard versions to maintain consistency
+- **Version**: Released as 0.4.1
+
 ## Future Development
 
 The project continues to evolve with a focus on:

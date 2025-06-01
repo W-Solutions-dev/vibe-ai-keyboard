@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2025-06-01
+
+### Fixed
+- Add proper spacing between sentences when typing
+  - Text now correctly adds a space before new sentences
+  - Prevents sentences from being concatenated without spaces
+  - Tracks last typed text to determine spacing needs
+  - Applied fix to all speech keyboard versions
+
 ## [0.4.0] - 1 Jun 2025
 
 ### Added
