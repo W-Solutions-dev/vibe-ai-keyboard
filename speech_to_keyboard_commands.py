@@ -268,6 +268,9 @@ class SecureSpeechKeyboard:
         self.last_text_time = 0
         self.duplicate_threshold = 2.0  # seconds
         
+        # Track last typed text for proper spacing
+        self.last_typed_text = ""
+        
         # Performance tracking
         self.recognition_count = 0
         self.total_recognition_time = 0
@@ -525,13 +528,24 @@ class SecureSpeechKeyboard:
                 processed_text = self.command_handler.process_text(text)
                 
                 if processed_text:
+                    # Check if we need to add a space before this text
+                    text_to_type = processed_text
+                    if self.last_typed_text:
+                        # If the last typed text ended with punctuation or a letter/number,
+                        # add a space before the new text
+                        last_char = self.last_typed_text.rstrip()[-1] if self.last_typed_text.rstrip() else ''
+                        if last_char and (last_char in '.!?,:;' or last_char.isalnum()):
+                            text_to_type = ' ' + processed_text
+                    
                     # Clear the line and show what will be typed
                     print(f"\r[Typing: {processed_text}]", end='', flush=True)
-                    # Type the text without extra space at the end
-                    self.keyboard_controller.type(processed_text)
+                    # Type the text
+                    self.keyboard_controller.type(text_to_type)
                     # Small delay to ensure typing completes
                     time.sleep(0.05)
-                    logger.info(f"Typed: '{processed_text}'")
+                    # Update last typed text
+                    self.last_typed_text = processed_text
+                    logger.info(f"Typed: '{text_to_type}'")
                 else:
                     print(f"\r[Command: {text}]", end='', flush=True)
             else:

@@ -93,6 +93,18 @@ class SpeechToKeyboard:
         self.false_positives = set(self.config['filtering']['false_positives'])
         self.min_text_length = self.config['filtering']['min_text_length']
         
+        # Duplicate detection
+        self.last_text = ""
+        self.last_text_time = 0
+        self.duplicate_threshold = 2.0  # seconds
+        
+        # Track last typed text for proper spacing
+        self.last_typed_text = ""
+        
+        # Performance tracking
+        self.recognition_count = 0
+        self.total_recognition_time = 0
+        
         print(f"Model loaded successfully!")
         print(f"Pre-buffer: {self.pre_buffer_size} chunks (~{self.pre_buffer_size * 30}ms)")
         print("Calibrating noise level... Please remain quiet for 2 seconds.")
@@ -306,16 +318,18 @@ class SpeechToKeyboard:
     def recognize_and_type(self, audio_frames):
         """Recognize speech and type it using keyboard simulation."""
         try:
-            # Convert audio frames to numpy array
+            start_time = time.time()
+            
             audio_data = b''.join(audio_frames)
             audio_np = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32) / 32768.0
             
             # Additional check: ensure audio has sufficient energy
             if np.max(np.abs(audio_np)) < 0.01:
-                print(" [Audio too quiet]")
+                print("\r[Audio too quiet]", end='', flush=True)
                 return
             
-            # Transcribe with Whisper
+            logger.debug(f"Processing {len(audio_np)/self.RATE:.2f} seconds of audio")
+            
             result = self.model.transcribe(
                 audio_np,
                 language=self.language,
@@ -325,17 +339,50 @@ class SpeechToKeyboard:
                 logprob_threshold=self.config['whisper']['logprob_threshold']
             )
             
+            recognition_time = time.time() - start_time
+            self.recognition_count += 1
+            self.total_recognition_time += recognition_time
+            
             text = result['text'].strip()
             
             # Filter out false positives using configuration
             if text and text not in self.false_positives and len(text) > self.min_text_length:
-                print(f" [{text}]")
-                # Type the recognized text
-                self.keyboard_controller.type(text)
+                # Check for duplicates
+                current_time = time.time()
+                if text == self.last_text and (current_time - self.last_text_time) < self.duplicate_threshold:
+                    print("\r[Duplicate ignored]", end='', flush=True)
+                    logger.debug(f"Ignored duplicate: '{text}'")
+                    return
+                
+                self.last_text = text
+                self.last_text_time = current_time
+                
+                logger.info(f"Recognized: '{text}' (took {recognition_time:.2f}s)")
+                
+                # Check if we need to add a space before this text
+                text_to_type = text
+                if self.last_typed_text:
+                    # If the last typed text ended with punctuation or a letter/number,
+                    # add a space before the new text
+                    last_char = self.last_typed_text.rstrip()[-1] if self.last_typed_text.rstrip() else ''
+                    if last_char and (last_char in '.!?,:;' or last_char.isalnum()):
+                        text_to_type = ' ' + text
+                
+                # Clear the line and show what will be typed
+                print(f"\r[Typing: {text}]", end='', flush=True)
+                # Type the text
+                self.keyboard_controller.type(text_to_type)
+                # Small delay to ensure typing completes
+                time.sleep(0.05)
+                # Update last typed text
+                self.last_typed_text = text
+                logger.info(f"Typed: '{text_to_type}'")
             else:
-                print(" [Filtered out]")
+                print("\r[Filtered out]", end='', flush=True)
+                logger.debug(f"Filtered out: '{text}'")
                 
         except Exception as e:
+            logger.error(f"Error in recognition: {e}", exc_info=True)
             print(f"\nError in recognition: {e}")
     
     def setup_hotkeys(self):
