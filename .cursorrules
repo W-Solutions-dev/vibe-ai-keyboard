@@ -224,6 +224,8 @@ speech-to-text-keyboard/
 - Present tense: "Add feature" not "Added feature"
 - Reference issues when applicable
 - Keep commits atomic and focused
+- **One feature per commit**: Never combine multiple features in a single commit
+- Each significant change should have its own commit for clear history
 
 ## Documentation Standards
 - Update README.md for major features
