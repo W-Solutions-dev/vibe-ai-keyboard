@@ -1,4 +1,8 @@
-# Local Speech-to-Text Keyboard
+# 🎙️ Vibe AI Keyboard - Local Speech-to-Text System
+
+[![GitHub Repository](https://img.shields.io/badge/GitHub-vibe--ai--keyboard-blue)](https://github.com/W-Solutions-dev/vibe-ai-keyboard)
+
+> 🌟 100% vibe coded with human-in-the-loop AI collaboration
 
 A local, privacy-focused speech-to-text system that acts like a USB keyboard. When enabled, it listens to your speech and types the recognized text directly into any application, just as if you were typing on a physical keyboard.
 
