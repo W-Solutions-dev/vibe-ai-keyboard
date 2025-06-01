@@ -62,13 +62,20 @@ class SpeechToKeyboard:
         self.consecutive_speech = self.config['detection']['consecutive_speech_chunks']
         self.calibration_seconds = self.config['detection']['calibration_duration_seconds']
         
+        # Audio buffer settings from config
+        self.speech_buffer = deque(maxlen=150)
+        
+        # Pre-buffer to capture audio before speech detection
+        self.pre_buffer_size = self.config['detection'].get('pre_buffer_chunks', 15)
+        self.pre_buffer = deque(maxlen=self.pre_buffer_size)
+        
         # Energy-based filtering
+        self.noise_levels = deque(maxlen=50)
         self.energy_threshold = 0.01
         self.calibrating = True
-        self.noise_levels = deque(maxlen=50)
         
         print(f"Model loaded successfully!")
-        print(f"Configuration loaded from {config_file}")
+        print(f"Pre-buffer: {self.pre_buffer_size} chunks (~{self.pre_buffer_size * 30}ms)")
         print(f"Calibrating noise level... Please remain quiet for {self.calibration_seconds} seconds.")
         
     def load_config(self, config_file):
@@ -81,10 +88,12 @@ class SpeechToKeyboard:
             },
             "detection": {
                 "vad_aggressiveness": 3,
+                "consecutive_speech_chunks": 3,
                 "silence_threshold_chunks": 30,
                 "min_speech_chunks": 10,
+                "pre_buffer_chunks": 15,
                 "energy_threshold_multiplier": 1.5,
-                "consecutive_speech_chunks": 3,
+                "noise_floor_multiplier": 3,
                 "calibration_duration_seconds": 2
             },
             "whisper": {
@@ -225,13 +234,22 @@ class SpeechToKeyboard:
                         self.calibrating = False
                     continue
                 
+                # Always add to pre-buffer when not speaking
+                if not is_speaking:
+                    self.pre_buffer.append(audio_chunk)
+                
                 if self.is_speech(audio_chunk):
                     speech_count += 1
                     if not is_speaking and speech_count >= self.consecutive_speech:
                         print("\n[Listening...]", end='', flush=True)
                         is_speaking = True
+                        # Add pre-buffer to speech frames to capture the beginning
+                        speech_frames.extend(list(self.pre_buffer))
+                        # Clear the pre-buffer
+                        self.pre_buffer.clear()
                     
-                    speech_frames.append(audio_chunk)
+                    if is_speaking:
+                        speech_frames.append(audio_chunk)
                     silence_count = 0
                 else:
                     if is_speaking:

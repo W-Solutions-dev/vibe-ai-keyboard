@@ -21,6 +21,7 @@ import logging
 import logging.handlers
 import argparse
 import os
+import json
 from datetime import datetime
 
 # Create logs directory if it doesn't exist
@@ -168,8 +169,11 @@ class CommandHandler:
         return text  # Return text if no command found
 
 class SecureSpeechKeyboard:
-    def __init__(self, model_size="base", language="en", enable_commands=False):
+    def __init__(self, model_size="base", language="en", enable_commands=False, config_file="speech_config.json"):
         """Initialize with security-focused defaults."""
+        # Load configuration
+        self.config = self.load_config(config_file)
+        
         logger.info("="*50)
         logger.info("Starting Speech-to-Text Keyboard")
         logger.info(f"Model: {model_size}, Language: {language}")
@@ -191,15 +195,15 @@ class SecureSpeechKeyboard:
             print("⚠️  Voice commands are ENABLED - be careful what you say!")
             logger.warning("Voice commands enabled - security restrictions apply")
         
-        # Audio settings
-        self.RATE = 16000
-        self.CHUNK = 480
+        # Audio settings from config
+        self.RATE = self.config['audio']['rate']
+        self.CHUNK = self.config['audio']['chunk_size']
         self.FORMAT = pyaudio.paInt16
-        self.CHANNELS = 1
+        self.CHANNELS = self.config['audio']['channels']
         
         # Voice activity detection
-        self.vad = webrtcvad.Vad(2)
-        logger.debug(f"VAD initialized with aggressiveness level 2")
+        self.vad = webrtcvad.Vad(self.config['speech_detection']['vad_aggressiveness'])
+        logger.debug(f"VAD initialized with aggressiveness level {self.config['speech_detection']['vad_aggressiveness']}")
         
         # Audio stream
         self.audio = pyaudio.PyAudio()
@@ -220,14 +224,82 @@ class SecureSpeechKeyboard:
         self.running = True
         self.audio_queue = queue.Queue()
         
-        self.silence_threshold = 15
+        # Audio buffer settings from config
+        self.silence_threshold = self.config['speech_detection']['silence_threshold_chunks']
+        self.min_speech_chunks = self.config['speech_detection']['min_speech_chunks']
+        
+        # Pre-buffer to capture audio before speech detection
+        self.pre_buffer_size = self.config['speech_detection']['pre_buffer_chunks']
+        self.pre_buffer = deque(maxlen=self.pre_buffer_size)
+        
+        # Energy-based filtering
+        self.energy_threshold = 0.01
+        self.calibrating = True
+        self.noise_levels = deque(maxlen=50)
+        
+        # Load filtering settings
+        self.false_positives = set(self.config['filtering']['false_positives'])
+        self.min_text_length = self.config['filtering']['min_text_length']
+        
+        # Duplicate detection
+        self.last_text = ""
+        self.last_text_time = 0
+        self.duplicate_threshold = 2.0  # seconds
         
         # Performance tracking
         self.recognition_count = 0
         self.total_recognition_time = 0
         
         print("Model loaded successfully!")
+        print(f"Pre-buffer: {self.pre_buffer_size} chunks (~{self.pre_buffer_size * 30}ms)")
+        print("Calibrating noise level... Please remain quiet for 2 seconds.")
+    
+    def load_config(self, config_file):
+        """Load configuration from file, use defaults if not found."""
+        default_config = {
+            "audio": {
+                "rate": 16000,
+                "chunk_size": 480,
+                "channels": 1
+            },
+            "speech_detection": {
+                "vad_aggressiveness": 3,
+                "pre_buffer_chunks": 15,
+                "silence_threshold_chunks": 30,
+                "min_speech_chunks": 10,
+                "energy_threshold_multiplier": 1.5,
+                "noise_floor_multiplier": 3,
+                "speech_detection_threshold": 1,
+                "calibration_duration_seconds": 2
+            },
+            "whisper": {
+                "model_size": "base",
+                "language": "en",
+                "temperature": 0.1,
+                "no_speech_threshold": 0.6,
+                "logprob_threshold": -1.0
+            },
+            "filtering": {
+                "min_text_length": 2,
+                "false_positives": [
+                    "", ".", "!", "?", "Thank you.", "Thanks.", "thank you",
+                    "Thanks for watching!", "you", "the", "uh", "um"
+                ]
+            }
+        }
         
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, 'r') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"Error loading config file: {e}. Using defaults.")
+                logger.error(f"Config file load error: {e}", exc_info=True)
+                return default_config
+        else:
+            logger.info(f"Config file not found. Using defaults.")
+            return default_config
+    
     def toggle_listening(self):
         """Toggle the listening state."""
         self.listening = not self.listening
@@ -271,14 +343,33 @@ class SecureSpeechKeyboard:
     
     def audio_callback(self, in_data, frame_count, time_info, status):
         """Callback for audio stream."""
-        if self.listening:
+        if self.listening or self.calibrating:
             self.audio_queue.put(in_data)
             logger.debug(f"Audio chunk queued - {len(in_data)} bytes")
         return (in_data, pyaudio.paContinue)
     
+    def calculate_energy(self, audio_chunk):
+        """Calculate the energy level of an audio chunk."""
+        audio_np = np.frombuffer(audio_chunk, dtype=np.int16).astype(np.float32) / 32768.0
+        return np.sqrt(np.mean(audio_np ** 2))
+    
     def is_speech(self, audio_chunk):
-        """Check if audio chunk contains speech."""
+        """Check if audio chunk contains speech with energy filtering."""
         try:
+            # First check energy level
+            energy = self.calculate_energy(audio_chunk)
+            
+            # During calibration, collect noise levels
+            if self.calibrating:
+                self.noise_levels.append(energy)
+                return False
+            
+            # Check if energy is above threshold (with some margin above noise floor)
+            energy_multiplier = self.config['speech_detection']['energy_threshold_multiplier']
+            if energy < self.energy_threshold * energy_multiplier:
+                return False
+            
+            # Then check with VAD
             is_speech = self.vad.is_speech(audio_chunk, self.RATE)
             logger.debug(f"VAD result: {'speech' if is_speech else 'silence'}")
             return is_speech
@@ -290,19 +381,49 @@ class SecureSpeechKeyboard:
         """Process audio from the queue."""
         speech_frames = []
         silence_count = 0
+        speech_count = 0
         is_speaking = False
+        calibration_chunks = 0
+        calibration_duration = self.config['speech_detection']['calibration_duration_seconds']
+        calibration_chunks_needed = int(calibration_duration * self.RATE / self.CHUNK)
+        speech_threshold = self.config['speech_detection']['speech_detection_threshold']
         
         while self.running:
             try:
                 audio_chunk = self.audio_queue.get(timeout=0.1)
                 
+                # Calibration phase
+                if self.calibrating:
+                    calibration_chunks += 1
+                    self.calculate_energy(audio_chunk)  # Collect noise samples
+                    
+                    if calibration_chunks >= calibration_chunks_needed:
+                        if self.noise_levels:
+                            # Set energy threshold based on noise floor
+                            noise_floor = np.mean(list(self.noise_levels))
+                            noise_multiplier = self.config['speech_detection']['noise_floor_multiplier']
+                            self.energy_threshold = max(0.01, noise_floor * noise_multiplier)
+                            print(f"Calibration complete. Noise floor: {noise_floor:.4f}")
+                        self.calibrating = False
+                    continue
+                
+                # Always add to pre-buffer when not speaking
+                if not is_speaking:
+                    self.pre_buffer.append(audio_chunk)
+                
                 if self.is_speech(audio_chunk):
-                    if not is_speaking:
+                    speech_count += 1
+                    if not is_speaking and speech_count >= speech_threshold:
                         print("\r[Listening...]", end='', flush=True)
                         logger.info("Speech detected, starting capture")
                         is_speaking = True
+                        # Add pre-buffer to speech frames to capture the beginning
+                        speech_frames.extend(list(self.pre_buffer))
+                        # Clear the pre-buffer
+                        self.pre_buffer.clear()
                     
-                    speech_frames.append(audio_chunk)
+                    if is_speaking:
+                        speech_frames.append(audio_chunk)
                     silence_count = 0
                 else:
                     if is_speaking:
@@ -310,13 +431,23 @@ class SecureSpeechKeyboard:
                         speech_frames.append(audio_chunk)
                         
                         if silence_count >= self.silence_threshold:
-                            print(" [Processing...]", end='', flush=True)
-                            logger.info(f"Speech ended, processing {len(speech_frames)} frames")
-                            self.recognize_and_type(speech_frames)
+                            # Only process if we had enough speech chunks
+                            if len(speech_frames) >= self.min_speech_chunks:
+                                print(" [Processing...]", end='', flush=True)
+                                logger.info(f"Speech ended, processing {len(speech_frames)} frames")
+                                self.recognize_and_type(speech_frames)
+                            else:
+                                print(" [Too short, ignoring]")
+                                logger.debug(f"Ignored short audio: {len(speech_frames)} frames")
+                            
                             speech_frames = []
                             silence_count = 0
+                            speech_count = 0
                             is_speaking = False
                             print()  # New line after processing complete
+                    else:
+                        # Reset speech count if we get non-speech while not speaking
+                        speech_count = 0
                             
             except queue.Empty:
                 continue
@@ -332,13 +463,20 @@ class SecureSpeechKeyboard:
             audio_data = b''.join(audio_frames)
             audio_np = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32) / 32768.0
             
+            # Additional check: ensure audio has sufficient energy
+            if np.max(np.abs(audio_np)) < 0.01:
+                print("\r[Audio too quiet]", end='', flush=True)
+                return
+            
             logger.debug(f"Processing {len(audio_np)/self.RATE:.2f} seconds of audio")
             
             result = self.model.transcribe(
                 audio_np,
                 language=self.language,
                 fp16=False,
-                temperature=0.1
+                temperature=self.config['whisper']['temperature'],
+                no_speech_threshold=self.config['whisper']['no_speech_threshold'],
+                logprob_threshold=self.config['whisper']['logprob_threshold']
             )
             
             recognition_time = time.time() - start_time
@@ -347,7 +485,18 @@ class SecureSpeechKeyboard:
             
             text = result['text'].strip()
             
-            if text:
+            # Filter out false positives using configuration
+            if text and text not in self.false_positives and len(text) > self.min_text_length:
+                # Check for duplicates
+                current_time = time.time()
+                if text == self.last_text and (current_time - self.last_text_time) < self.duplicate_threshold:
+                    print("\r[Duplicate ignored]", end='', flush=True)
+                    logger.debug(f"Ignored duplicate: '{text}'")
+                    return
+                
+                self.last_text = text
+                self.last_text_time = current_time
+                
                 logger.info(f"Recognized: '{text}' (took {recognition_time:.2f}s)")
                 
                 # Process through command handler
@@ -356,16 +505,16 @@ class SecureSpeechKeyboard:
                 if processed_text:
                     # Clear the line and show what will be typed
                     print(f"\r[Typing: {processed_text}]", end='', flush=True)
-                    # Type the text
-                    self.keyboard_controller.type(processed_text + " ")
+                    # Type the text without extra space at the end
+                    self.keyboard_controller.type(processed_text)
                     # Small delay to ensure typing completes
                     time.sleep(0.05)
                     logger.info(f"Typed: '{processed_text}'")
                 else:
                     print(f"\r[Command: {text}]", end='', flush=True)
             else:
-                print("\r[No speech detected]", end='', flush=True)
-                logger.debug("No speech detected in audio")
+                print("\r[Filtered out]", end='', flush=True)
+                logger.debug(f"Filtered out: '{text}'")
                 
         except Exception as e:
             logger.error(f"Error in recognition: {e}", exc_info=True)
@@ -402,6 +551,10 @@ class SecureSpeechKeyboard:
         print("=====================================\n")
         
         hotkey_listener = self.setup_hotkeys()
+        
+        # Start audio stream for calibration
+        self.start_audio_stream()
+        
         audio_thread = threading.Thread(target=self.process_audio, daemon=True)
         audio_thread.start()
         logger.info("Audio processing thread started")

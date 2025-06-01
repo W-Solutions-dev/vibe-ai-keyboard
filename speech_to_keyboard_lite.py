@@ -14,19 +14,33 @@ import whisper
 from pynput import keyboard
 from pynput.keyboard import Controller, Key
 import argparse
+import json
+import os
+from collections import deque
 
 class SimpleSpeechKeyboard:
-    def __init__(self, model_size="tiny", continuous=False):
+    def __init__(self, model_size="tiny", continuous=False, config_file="speech_config.json"):
         """Initialize with minimal configuration."""
+        # Load configuration
+        self.config = self.load_config(config_file)
+        
         print(f"Loading Whisper {model_size} model...")
         self.model = whisper.load_model(model_size)
         self.continuous = continuous
         
-        # Audio settings
-        self.RATE = 16000
-        self.CHUNK = 1024
+        # Audio settings from config
+        self.RATE = self.config['audio']['rate']
+        self.CHUNK = self.config['audio']['chunk_size']
         self.FORMAT = pyaudio.paInt16
-        self.CHANNELS = 1
+        self.CHANNELS = self.config['audio']['channels']
+        
+        # Pre-buffer for capturing beginning of speech
+        self.pre_buffer_size = self.config['speech_detection']['pre_buffer_chunks']
+        self.pre_buffer = deque(maxlen=self.pre_buffer_size)
+        
+        # False positive filtering
+        self.false_positives = set(self.config['filtering']['false_positives'])
+        self.min_text_length = self.config['filtering']['min_text_length']
         
         # Keyboard controller
         self.keyboard_controller = Controller()
@@ -39,8 +53,48 @@ class SimpleSpeechKeyboard:
         self.audio = pyaudio.PyAudio()
         self.stream = None
         
-        print("Ready! Press F9 to start/stop listening.")
+        print(f"Ready! Press F9 to start/stop listening.")
+        print(f"Pre-buffer: {self.pre_buffer_size} chunks (~{self.pre_buffer_size * 30}ms)")
         
+    def load_config(self, config_file):
+        """Load configuration from file, use defaults if not found."""
+        default_config = {
+            "audio": {
+                "rate": 16000,
+                "chunk_size": 1024,
+                "channels": 1
+            },
+            "speech_detection": {
+                "pre_buffer_chunks": 10,  # Smaller for lite version
+            },
+            "whisper": {
+                "temperature": 0.0,
+                "no_speech_threshold": 0.6
+            },
+            "filtering": {
+                "min_text_length": 2,
+                "false_positives": [
+                    "", ".", "!", "?", "Thank you.", "Thanks.", "thank you",
+                    "Thanks for watching!", "you", "the", "uh", "um"
+                ]
+            }
+        }
+        
+        if os.path.exists(config_file):
+            try:
+                with open(config_file, 'r') as f:
+                    loaded_config = json.load(f)
+                    # Merge with defaults (in case some keys are missing)
+                    for key in default_config:
+                        if key not in loaded_config:
+                            loaded_config[key] = default_config[key]
+                    return loaded_config
+            except Exception as e:
+                print(f"Error loading config file: {e}. Using defaults.")
+                return default_config
+        else:
+            return default_config
+    
     def toggle_listening(self):
         """Toggle listening state."""
         self.listening = not self.listening
@@ -90,18 +144,19 @@ class SimpleSpeechKeyboard:
                     audio_np,
                     language="en",
                     fp16=False,
-                    temperature=0.0,
-                    no_speech_threshold=0.6
+                    temperature=self.config['whisper']['temperature'],
+                    no_speech_threshold=self.config['whisper']['no_speech_threshold']
                 )
                 
                 text = result['text'].strip()
-                if text and text not in [".", " ", ""]:
-                    # Add space before text if not starting with punctuation
-                    if not text[0] in ".,!?;:":
-                        text = " " + text
-                    
+                
+                # Filter out false positives
+                if text and text not in self.false_positives and len(text) > self.min_text_length:
+                    # Don't add extra spaces, let user control spacing
                     print(f"📝 {text}")
                     self.keyboard_controller.type(text)
+                elif text:
+                    print(f"[Filtered: {text}]")
                     
             except Exception as e:
                 print(f"Error: {e}")
