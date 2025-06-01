@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2025-06-01
+
+### Fixed
+- Fixed TypeError in voice commands when using keyboard shortcuts
+  - All keyboard combinations (Ctrl+C, Shift+Enter, etc.) were failing due to incorrect pynput usage
+  - Changed from `kb.press(Key.ctrl, 'c')` to proper press/release sequence
+  - Affects all voice commands: new line, copy, paste, cut, undo, redo, select all
+  - Commands now execute properly instead of throwing errors
+- Fixed navigation keys getting stuck (holding down indefinitely)
+  - All single key presses now properly include release() calls
+  - Navigation commands no longer repeat infinitely
+
+### Changed
+- Navigation commands now use terminal-style word jumping
+  - "go left/right" now uses Ctrl+arrow for word navigation instead of single character movement
+  - Added tab navigation: "tab left/right", "next/previous tab" for browser/editor tab switching
+  - Added line navigation: "start of line", "end of line" commands
+  - Improved documentation to clearly describe navigation behavior
+
 ## [0.4.1] - 2025-06-01
 
 ### Fixed

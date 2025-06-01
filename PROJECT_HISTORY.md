@@ -599,6 +599,39 @@ This update reinforces the project's core value of absolute privacy while expand
   - Updated documentation to clarify the distinction
 - **Result**: Voice commands now work reliably regardless of Whisper's formatting, and behave more intuitively
 
+## 2025-06-01: Keyboard Shortcuts Fix - TypeError in Commands Version
+- **User Report**: User showed terminal output with error: "TypeError: Controller.press() takes 2 positional arguments but 3 were given"
+- **Issue**: All keyboard shortcuts (new line, copy, paste, etc.) were failing because the code was incorrectly trying to pass multiple keys to the `press()` method
+- **Technical Detail**: The pynput library's `press()` method only accepts one key at a time, not key combinations
+- **Solution**: Changed all keyboard shortcuts to use proper press/release sequence:
+  - Before: `kb.press(Key.ctrl, 'c')` (incorrect)
+  - After: `(kb.press(Key.ctrl), kb.press('c'), kb.release('c'), kb.release(Key.ctrl))` (correct)
+- **Impact**: Fixed all voice commands that use keyboard shortcuts including:
+  - "new line" (Shift+Enter)
+  - "copy" (Ctrl+C)
+  - "paste" (Ctrl+V)
+  - "cut" (Ctrl+X)
+  - "undo" (Ctrl+Z)
+  - "redo" (Ctrl+Y)
+  - "select all" (Ctrl+A)
+- **Result**: Voice commands now execute properly instead of throwing TypeErrors
+
+## 2025-06-01: Navigation Keys Fix - Keys Stuck & Terminal-Style Word Jumping
+- **User Report**: "go left or any other keeps going left or other" - navigation keys were getting stuck
+- **Additional Request**: "make it control tab left right or up so that it jumps works like in the terminal"
+- **Issue**: Navigation keys (arrow keys) were being pressed but never released, causing them to repeat indefinitely
+- **Solution**: 
+  1. Fixed all single key presses to include proper release() calls
+  2. Changed "go left/right" to use Ctrl+arrow for word navigation (like terminal behavior)
+  3. Added tab navigation commands for browser/editor tab switching
+  4. Added proper line navigation commands
+- **Technical Implementation**:
+  - All keys now follow press/release pattern: `(kb.press(Key.left), kb.release(Key.left))`
+  - Word navigation: `go left/right` now uses Ctrl+arrow keys
+  - Tab navigation: Added `tab left/right`, `next/previous tab` using Ctrl+(Shift+)Tab
+  - Line navigation: Added `start/end of line` commands
+- **Result**: Navigation commands now work properly without getting stuck and provide terminal-style word jumping
+
 ## Future Development
 
 The project continues to evolve with a focus on:
