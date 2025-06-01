@@ -102,22 +102,34 @@ class CommandHandler:
     SAFE_COMMANDS = {
         # Text navigation
         "new line": lambda kb: (kb.press(Key.shift), kb.press(Key.enter), kb.release(Key.enter), kb.release(Key.shift)),  # Soft line break
-        "enter": lambda kb: kb.press(Key.enter),  # Regular enter/new paragraph
-        "press enter": lambda kb: kb.press(Key.enter),
-        "press tab": lambda kb: kb.press(Key.tab),
-        "press space": lambda kb: kb.press(Key.space),
-        "backspace": lambda kb: kb.press(Key.backspace),
-        "delete": lambda kb: kb.press(Key.delete),
+        "enter": lambda kb: (kb.press(Key.enter), kb.release(Key.enter)),  # Regular enter/new paragraph
+        "press enter": lambda kb: (kb.press(Key.enter), kb.release(Key.enter)),
+        "press tab": lambda kb: (kb.press(Key.tab), kb.release(Key.tab)),
+        "press space": lambda kb: (kb.press(Key.space), kb.release(Key.space)),
+        "backspace": lambda kb: (kb.press(Key.backspace), kb.release(Key.backspace)),
+        "delete": lambda kb: (kb.press(Key.delete), kb.release(Key.delete)),
         
-        # Basic navigation (no system keys)
-        "go left": lambda kb: kb.press(Key.left),
-        "go right": lambda kb: kb.press(Key.right),
-        "go up": lambda kb: kb.press(Key.up),
-        "go down": lambda kb: kb.press(Key.down),
-        "page up": lambda kb: kb.press(Key.page_up),
-        "page down": lambda kb: kb.press(Key.page_down),
-        "home": lambda kb: kb.press(Key.home),
-        "end": lambda kb: kb.press(Key.end),
+        # Word navigation (like terminal) - using Ctrl+arrow
+        "go left": lambda kb: (kb.press(Key.ctrl), kb.press(Key.left), kb.release(Key.left), kb.release(Key.ctrl)),
+        "go right": lambda kb: (kb.press(Key.ctrl), kb.press(Key.right), kb.release(Key.right), kb.release(Key.ctrl)),
+        "go up": lambda kb: (kb.press(Key.up), kb.release(Key.up)),
+        "go down": lambda kb: (kb.press(Key.down), kb.release(Key.down)),
+        
+        # Tab navigation (for browsers/editors)
+        "tab left": lambda kb: (kb.press(Key.ctrl), kb.press(Key.shift), kb.press(Key.tab), kb.release(Key.tab), kb.release(Key.shift), kb.release(Key.ctrl)),
+        "tab right": lambda kb: (kb.press(Key.ctrl), kb.press(Key.tab), kb.release(Key.tab), kb.release(Key.ctrl)),
+        "next tab": lambda kb: (kb.press(Key.ctrl), kb.press(Key.tab), kb.release(Key.tab), kb.release(Key.ctrl)),
+        "previous tab": lambda kb: (kb.press(Key.ctrl), kb.press(Key.shift), kb.press(Key.tab), kb.release(Key.tab), kb.release(Key.shift), kb.release(Key.ctrl)),
+        
+        # Page navigation
+        "page up": lambda kb: (kb.press(Key.page_up), kb.release(Key.page_up)),
+        "page down": lambda kb: (kb.press(Key.page_down), kb.release(Key.page_down)),
+        "home": lambda kb: (kb.press(Key.home), kb.release(Key.home)),
+        "end": lambda kb: (kb.press(Key.end), kb.release(Key.end)),
+        
+        # Line navigation
+        "start of line": lambda kb: (kb.press(Key.home), kb.release(Key.home)),
+        "end of line": lambda kb: (kb.press(Key.end), kb.release(Key.end)),
         
         # Text selection (safe) - Fixed to use proper key combination syntax
         "select all": lambda kb: (kb.press(Key.ctrl), kb.press('a'), kb.release('a'), kb.release(Key.ctrl)),
@@ -583,10 +595,12 @@ class SecureSpeechKeyboard:
         if self.command_handler.enabled:
             print("\nVoice Commands Available:")
             print("- 'new line' (Shift+Enter) or 'enter'/'press enter' (Enter)")
-            print("- 'press tab', 'press space'")
-            print("- 'copy', 'paste', 'cut'")
-            print("- 'select all', 'undo', 'redo'")
-            print("- Navigation: 'go left/right/up/down'")
+            print("- 'press tab', 'press space', 'backspace', 'delete'")
+            print("- 'copy', 'paste', 'cut', 'select all', 'undo', 'redo'")
+            print("- Word Navigation: 'go left/right' (Ctrl+arrow for word jumping)")
+            print("- Line Navigation: 'go up/down', 'start/end of line'")
+            print("- Tab Navigation: 'tab left/right', 'next/previous tab' (browser/editor tabs)")
+            print("- Page Navigation: 'page up/down', 'home', 'end'")
         
         print("=====================================\n")
         
