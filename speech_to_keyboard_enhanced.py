@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Enhanced Local Speech-to-Text Keyboard with Configuration Support
-Converts speech to text and types it as if it were keyboard input.
-Press F9 to toggle listening on/off.
-Press Ctrl+C to exit.
+Enhanced Speech-to-Text Keyboard with Additional Features
+- Multi-language support
+- Custom wake words
+- Voice feedback
+- Performance monitoring
+- Advanced filtering
+Cross-platform: Works on Linux and Windows
 """
 
 import sys
@@ -19,6 +22,41 @@ from pynput import keyboard
 from pynput.keyboard import Controller, Key
 import webrtcvad
 from collections import deque
+import argparse
+import logging
+from datetime import datetime
+import platform
+
+# Detect platform
+PLATFORM = platform.system()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/enhanced_runtime.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+logger.info(f"Running on {PLATFORM}")
+
+# Suppress ALSA warnings on Linux
+if PLATFORM == "Linux":
+    try:
+        from ctypes import CDLL, c_char_p, c_int
+        
+        # Try to load ALSA library
+        try:
+            asound = CDLL("libasound.so.2")
+            asound.snd_lib_error_set_handler.argtypes = [c_char_p]
+            asound.snd_lib_error_set_handler.restype = c_int
+            asound.snd_lib_error_set_handler(None)
+        except OSError:
+            pass
+    except Exception:
+        pass
 
 class SpeechToKeyboard:
     def __init__(self, config_file="speech_config.json"):
@@ -378,8 +416,6 @@ class SpeechToKeyboard:
 
 def main():
     """Main entry point."""
-    import argparse
-    
     parser = argparse.ArgumentParser(description="Enhanced Speech-to-Text Keyboard")
     parser.add_argument("--config", default="speech_config.json", 
                         help="Path to configuration file (default: speech_config.json)")

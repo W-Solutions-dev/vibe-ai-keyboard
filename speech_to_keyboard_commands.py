@@ -3,6 +3,7 @@
 Speech-to-Text Keyboard with Command Support
 Includes voice commands like "press enter", "new line", etc.
 Commands are disabled by default for security.
+Cross-platform: Works on Linux and Windows
 """
 
 import re
@@ -23,6 +24,10 @@ import argparse
 import os
 import json
 from datetime import datetime
+import platform
+
+# Detect platform
+PLATFORM = platform.system()
 
 # Create logs directory if it doesn't exist
 LOGS_DIR = os.path.join(os.path.dirname(__file__), 'logs')
@@ -67,11 +72,28 @@ def setup_logging(log_level=logging.INFO, console_output=True):
     # Log startup
     logging.info(f"Logging initialized - Level: {logging.getLevelName(log_level)}")
     logging.info(f"Runtime log: {runtime_log}")
+    logging.info(f"Platform: {PLATFORM}")
     
     return root_logger
 
 # Get logger for this module
 logger = logging.getLogger(__name__)
+
+# Suppress ALSA warnings on Linux
+if PLATFORM == "Linux":
+    try:
+        from ctypes import CDLL, c_char_p, c_int
+        
+        # Try to load ALSA library
+        try:
+            asound = CDLL("libasound.so.2")
+            asound.snd_lib_error_set_handler.argtypes = [c_char_p]
+            asound.snd_lib_error_set_handler.restype = c_int
+            asound.snd_lib_error_set_handler(None)
+        except OSError:
+            pass
+    except Exception:
+        pass
 
 class CommandHandler:
     """Handle voice commands with security restrictions."""

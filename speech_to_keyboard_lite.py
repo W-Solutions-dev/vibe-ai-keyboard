@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
 Lightweight Speech-to-Text Keyboard
-A simpler version using the tiny model for faster performance.
+Minimal version with continuous listening and reduced features.
+Uses tiny model for speed over accuracy.
+Cross-platform: Works on Linux and Windows
 """
 
 import sys
@@ -17,6 +19,27 @@ import argparse
 import json
 import os
 from collections import deque
+import platform
+
+# Detect platform
+PLATFORM = platform.system()
+print(f"Running on {PLATFORM}")
+
+# Suppress ALSA warnings on Linux
+if PLATFORM == "Linux":
+    try:
+        from ctypes import CDLL, c_char_p, c_int
+        
+        # Try to load ALSA library
+        try:
+            asound = CDLL("libasound.so.2")
+            asound.snd_lib_error_set_handler.argtypes = [c_char_p]
+            asound.snd_lib_error_set_handler.restype = c_int
+            asound.snd_lib_error_set_handler(None)
+        except OSError:
+            pass
+    except Exception:
+        pass
 
 class SimpleSpeechKeyboard:
     def __init__(self, model_size="tiny", continuous=False, config_file="speech_config.json"):
