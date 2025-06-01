@@ -4,7 +4,7 @@
 
 A local, privacy-focused speech-to-text system that acts like a USB keyboard. When enabled, it listens to your speech and types the recognized text directly into any application, just as if you were typing on a physical keyboard.
 
-> **🌟 Note**: This project is 100% vibe coded with a human in the loop. Every feature is crafted through the collaborative dance between human creativity and AI assistance, ensuring both innovation and practical usability.
+> **🌟 Note**: This project is 100% vibe coded with a human in the loop. Every feature is crafted through the collaborative dance between human creativity and AI assistance, ensuring both innovation and practical usability. This project came alive through approximately 500 Claude Opus max requests, with continuous refinement and improvement planned for the future.
 
 ## Features
 

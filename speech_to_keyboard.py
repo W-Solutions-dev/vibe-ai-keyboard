@@ -292,7 +292,7 @@ class SpeechToKeyboard:
             if text and text not in self.false_positives and len(text) > self.min_text_length:
                 print(f" [{text}]")
                 # Type the recognized text
-                self.keyboard_controller.type(text + " ")
+                self.keyboard_controller.type(text)
             else:
                 print(" [Filtered out]")
                 
