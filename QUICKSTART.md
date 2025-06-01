@@ -82,4 +82,16 @@ python test_setup.py
 - **No audio detected**: Check microphone permissions
 - **High CPU usage**: Use 'tiny' model or reduce sensitivity
 - **Too many false positives**: Increase thresholds in config
-- **Missing audio**: Run `setup.sh` again 
+- **Missing audio**: Run `setup.sh` again
+
+### Known Issues & Solutions
+
+**First words cut off?**
+- This has been fixed! The system now uses a pre-buffer to capture ~450ms before speech detection
+- Adjust `pre_buffer_chunks` in `speech_config.json` if needed
+- Test with: `python test_prebuffer.py`
+
+**False detections?**
+- Increase `energy_threshold_multiplier` in config
+- Add common false positives to the `false_positives` list
+- Use the enhanced version for better filtering 
