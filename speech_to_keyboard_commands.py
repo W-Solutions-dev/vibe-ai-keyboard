@@ -298,7 +298,7 @@ class SecureSpeechKeyboard:
                 
                 if self.is_speech(audio_chunk):
                     if not is_speaking:
-                        print("\n[Listening...]", end='', flush=True)
+                        print("\r[Listening...]", end='', flush=True)
                         logger.info("Speech detected, starting capture")
                         is_speaking = True
                     
@@ -316,6 +316,7 @@ class SecureSpeechKeyboard:
                             speech_frames = []
                             silence_count = 0
                             is_speaking = False
+                            print()  # New line after processing complete
                             
             except queue.Empty:
                 continue
@@ -353,13 +354,17 @@ class SecureSpeechKeyboard:
                 processed_text = self.command_handler.process_text(text)
                 
                 if processed_text:
-                    print(f" [{processed_text}]")
+                    # Clear the line and show what will be typed
+                    print(f"\r[Typing: {processed_text}]", end='', flush=True)
+                    # Type the text
                     self.keyboard_controller.type(processed_text + " ")
+                    # Small delay to ensure typing completes
+                    time.sleep(0.05)
                     logger.info(f"Typed: '{processed_text}'")
                 else:
-                    print(f" [Command executed: {text}]")
+                    print(f"\r[Command: {text}]", end='', flush=True)
             else:
-                print(" [No speech detected]")
+                print("\r[No speech detected]", end='', flush=True)
                 logger.debug("No speech detected in audio")
                 
         except Exception as e:
