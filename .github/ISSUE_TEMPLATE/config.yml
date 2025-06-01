@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/W-Solutions-dev/vibe-ai-keyboard/discussions
+    about: For general questions, ideas, and show & tell
+  - name: 📖 Documentation
+    url: https://github.com/W-Solutions-dev/vibe-ai-keyboard/blob/main/README.md
+    about: Check out the documentation first
+  - name: 🚀 Quick Start
+    url: https://github.com/W-Solutions-dev/vibe-ai-keyboard/blob/main/QUICKSTART.md
+    about: Get started quickly with the quick start guide 
