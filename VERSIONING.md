@@ -118,56 +118,12 @@ refactor(logging): implement structured JSON logging
 2. Tag the release: `git tag -a v1.0.0 -m "Release version 1.0.0"`
 3. Push tags: `git push origin v1.0.0`
 4. Create GitHub release with changelog
-5. Trigger CI/CD pipeline
 
 ### Post-release
 - [ ] Publish to PyPI
 - [ ] Update Docker images
 - [ ] Announce on project channels
 - [ ] Merge main back to develop
-
-## CI/CD Pipeline
-
-### GitHub Actions Workflow
-
-```yaml
-# .github/workflows/release.yml
-name: Release
-
-on:
-  push:
-    tags:
-      - 'v*'
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run tests
-        run: |
-          python -m pytest
-          ./test_helper.sh all
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build packages
-        run: |
-          python setup.py sdist bdist_wheel
-          docker build -t speech-to-keyboard .
-
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Publish to PyPI
-        run: python -m twine upload dist/*
-      
-      - name: Push to Docker Hub
-        run: docker push speech-to-keyboard:latest
-```
 
 ## Version History Format
 

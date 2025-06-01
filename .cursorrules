@@ -3,11 +3,55 @@
 ## Project Overview
 A local, privacy-focused speech-to-text system that acts like a USB keyboard, with optional voice command support. All processing happens locally using OpenAI's Whisper model.
 
+> **🌟 Note**: This project is 100% vibe coded with a human in the loop. Every feature is crafted through the collaborative dance between human creativity and AI assistance, ensuring both innovation and practical usability.
+
 ## Core Principles
 1. **Privacy First**: All processing must be local, no cloud services
 2. **Security by Default**: Commands disabled by default, whitelist approach
 3. **User Control**: Clear visual/audio feedback, easy toggle on/off
 4. **Accessibility**: Works system-wide in any application
+
+## Autonomous Versioning & Git Management
+
+### AI-Driven Git Workflow
+This project uses an autonomous versioning system where:
+- **Human Role**: Vibe code, provide instructions, create features
+- **AI Role**: Handle ALL git operations, versioning, and release management
+
+### How It Works
+1. Human provides feature/fix instructions
+2. AI implements the changes
+3. AI handles all git operations:
+   - Creating appropriate branches
+   - Writing conventional commit messages
+   - Managing version numbers
+   - Updating CHANGELOG.md
+   - Creating tags and releases
+   - Maintaining branch hygiene
+
+### Versioning Instructions for AI
+When managing this project, the AI MUST:
+- Follow semantic versioning strictly (MAJOR.MINOR.PATCH)
+- Use conventional commits for all messages
+- Update version numbers in all relevant files
+- Maintain comprehensive CHANGELOG.md entries
+- Create appropriate git tags
+- Follow the branch strategy outlined in VERSIONING.md
+- Never wait for human confirmation on git operations
+
+### Example Workflow
+```
+Human: "Add voice UI control feature"
+AI: 
+1. Creates feature/voice-ui-control branch
+2. Implements the feature
+3. Commits with "feat(ui): add voice-controlled UI automation"
+4. Updates CHANGELOG.md
+5. Manages PR/merge when ready
+6. Tags release if appropriate
+```
+
+The human should NEVER need to run git commands manually. The AI handles everything.
 
 ## Code Style Guidelines
 
