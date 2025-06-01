@@ -227,6 +227,27 @@ speech-to-text-keyboard/
 - **One feature per commit**: Never combine multiple features in a single commit
 - Each significant change should have its own commit for clear history
 
+## Code Synchronization Rule
+When making changes to any speech keyboard version:
+- **Always check if the change applies to other versions**
+- **Update all applicable versions to maintain consistency**
+- **Core features must be synchronized across:**
+  - `speech_to_keyboard.py` (main version)
+  - `speech_to_keyboard_commands.py` (with voice commands)
+  - `speech_to_keyboard_enhanced.py` (enhanced features)
+  - `speech_to_keyboard_lite.py` (lightweight version)
+- **Shared logic includes:**
+  - Configuration file handling
+  - Pre-buffer system
+  - False positive filtering
+  - Audio processing improvements
+  - Bug fixes that affect core functionality
+- **Version-specific features can remain unique:**
+  - Commands version: voice command handling
+  - Enhanced version: advanced UI features
+  - Lite version: simplified processing for performance
+- **Always run `./test_all_versions.sh` after cross-version changes**
+
 ## Documentation Standards
 - Update README.md for major features
 - Keep QUICKSTART.md concise

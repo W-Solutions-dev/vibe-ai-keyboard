@@ -255,6 +255,23 @@ Clean, uninterrupted text output that matches the behavior of the main applicati
 ### Result
 All versions now share the same core logic and features from the main version, ensuring consistent behavior and performance across the entire project.
 
+## January 6, 2025 - Code Synchronization Rule Added
+
+### User Request
+"add a cursor rule that all changes to any file need to reflect to others if applicable in this regard as well."
+
+**User Context**: After unifying the core logic across all versions, user wanted to ensure future changes would maintain this consistency.
+
+### Solution Implemented
+Added comprehensive rule to `.cursorrules` that mandates:
+- Checking if changes apply to other versions
+- Updating all applicable versions to maintain consistency
+- Clear delineation of shared vs version-specific features
+- Requirement to run test script after cross-version changes
+
+### Impact
+This ensures that future improvements, bug fixes, and features are properly propagated across all versions, preventing the divergence that necessitated the earlier unification effort.
+
 ---
 
 *"Vibe coding: Where human creativity meets AI capability"* 
