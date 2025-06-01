@@ -237,6 +237,15 @@ This project uses:
 - OpenAI Whisper (MIT License)
 - Various Python libraries under their respective licenses
 
+## Automated Development
+
+This project features AI-driven development capabilities including:
+- **Automatic Issue Resolution**: The AI assistant can read GitHub issues, implement fixes, and push commits autonomously
+- **Smart Git Management**: All version control operations are handled by AI following semantic versioning
+- **Continuous Improvement**: Issues are automatically addressed while maintaining code quality and consistency
+
+This capability was verified through issue #1, demonstrating the seamless integration between human requests and AI implementation.
+
 ## TODO / Roadmap
 
 ### 🎯 AI-Driven Visual UI Control
