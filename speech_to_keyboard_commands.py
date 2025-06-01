@@ -101,7 +101,7 @@ class CommandHandler:
     # Define allowed commands (whitelist approach for security)
     SAFE_COMMANDS = {
         # Text navigation
-        "new line": lambda kb: kb.press(Key.shift, Key.enter),  # Soft line break
+        "new line": lambda kb: (kb.press(Key.shift), kb.press(Key.enter), kb.release(Key.enter), kb.release(Key.shift)),  # Soft line break
         "enter": lambda kb: kb.press(Key.enter),  # Regular enter/new paragraph
         "press enter": lambda kb: kb.press(Key.enter),
         "press tab": lambda kb: kb.press(Key.tab),
@@ -119,13 +119,13 @@ class CommandHandler:
         "home": lambda kb: kb.press(Key.home),
         "end": lambda kb: kb.press(Key.end),
         
-        # Text selection (safe)
-        "select all": lambda kb: kb.press(Key.ctrl, 'a'),
-        "copy": lambda kb: kb.press(Key.ctrl, 'c'),
-        "paste": lambda kb: kb.press(Key.ctrl, 'v'),
-        "cut": lambda kb: kb.press(Key.ctrl, 'x'),
-        "undo": lambda kb: kb.press(Key.ctrl, 'z'),
-        "redo": lambda kb: kb.press(Key.ctrl, 'y'),
+        # Text selection (safe) - Fixed to use proper key combination syntax
+        "select all": lambda kb: (kb.press(Key.ctrl), kb.press('a'), kb.release('a'), kb.release(Key.ctrl)),
+        "copy": lambda kb: (kb.press(Key.ctrl), kb.press('c'), kb.release('c'), kb.release(Key.ctrl)),
+        "paste": lambda kb: (kb.press(Key.ctrl), kb.press('v'), kb.release('v'), kb.release(Key.ctrl)),
+        "cut": lambda kb: (kb.press(Key.ctrl), kb.press('x'), kb.release('x'), kb.release(Key.ctrl)),
+        "undo": lambda kb: (kb.press(Key.ctrl), kb.press('z'), kb.release('z'), kb.release(Key.ctrl)),
+        "redo": lambda kb: (kb.press(Key.ctrl), kb.press('y'), kb.release('y'), kb.release(Key.ctrl)),
     }
     
     # Commands that are explicitly blocked for security
