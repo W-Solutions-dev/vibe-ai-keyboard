@@ -4,9 +4,11 @@ Local Speech-to-Text Keyboard
 Converts speech to text and types it as if it were keyboard input.
 Press F9 to toggle listening on/off.
 Press Ctrl+C to exit.
+
+Cross-platform: Works on Linux and Windows
 """
 
-__version__ = "0.2.1"
+__version__ = "0.3.1"
 
 import sys
 import time
@@ -22,6 +24,16 @@ from collections import deque
 import json
 import os
 import argparse
+import platform
+import logging
+from pathlib import Path
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class SpeechToKeyboard:
     def __init__(self, config_file="speech_config.json"):
@@ -31,6 +43,10 @@ class SpeechToKeyboard:
         Args:
             config_file: Path to configuration file
         """
+        # Detect platform
+        self.platform = platform.system()
+        logger.info(f"Running on {self.platform}")
+        
         # Load configuration
         self.config = self.load_config(config_file)
         
@@ -80,6 +96,29 @@ class SpeechToKeyboard:
         print(f"Model loaded successfully!")
         print(f"Pre-buffer: {self.pre_buffer_size} chunks (~{self.pre_buffer_size * 30}ms)")
         print("Calibrating noise level... Please remain quiet for 2 seconds.")
+        
+        # Suppress ALSA warnings on Linux
+        if self.platform == "Linux":
+            self._suppress_alsa_warnings()
+    
+    def _suppress_alsa_warnings(self):
+        """Suppress ALSA warnings on Linux."""
+        try:
+            from ctypes import CDLL, c_char_p, c_int
+            
+            # Try to load ALSA library
+            try:
+                asound = CDLL("libasound.so.2")
+            except OSError:
+                return
+            
+            # Set error handler to null
+            asound.snd_lib_error_set_handler.argtypes = [c_char_p]
+            asound.snd_lib_error_set_handler.restype = c_int
+            asound.snd_lib_error_set_handler(None)
+        except Exception:
+            # If suppression fails, continue anyway
+            pass
     
     def load_config(self, config_file):
         """Load configuration from file, use defaults if not found."""
