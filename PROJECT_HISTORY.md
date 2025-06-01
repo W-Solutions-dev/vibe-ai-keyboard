@@ -632,9 +632,69 @@ This update reinforces the project's core value of absolute privacy while expand
   - Line navigation: Added `start/end of line` commands
 - **Result**: Navigation commands now work properly without getting stuck and provide terminal-style word jumping
 
+## 2025-06-01: Navigation Commands Being Typed as Text
+- **User Report**: "go down and up work left and right down and it also prints go down/left/right/up to the screen, which it should not"
+- **Issue**: Navigation commands like "Go left.", "Go down." were being typed as text instead of executing as commands
+- **Root Cause**: Whisper sometimes adds capitalization and punctuation that prevented exact command matching
+- **Solution**: 
+  - Enhanced command matching to handle case variations and punctuation differences
+  - Added fuzzy matching for commands (e.g., "Go left." matches "go left")
+  - Added navigation command filtering to prevent them from ever being typed as text
+  - If a navigation command is spoken but not perfectly matched, it's now executed instead of typed
+- **Technical Details**:
+  - Added iterative command checking with cleaned text
+  - Implemented specific navigation command list for filtering
+  - Commands are now matched regardless of capitalization or trailing punctuation
+- **Result**: Navigation commands consistently execute as intended without appearing as typed text
+
+## 2025-06-01: Duplicate Typing Fix - Kill Existing Instances
+- **User Report**: Text was being typed multiple times with overlapping/duplicated characters (e.g., "Well, let's test.Well, it's dust. Let' sL ette'sst .test.")
+- **Issue**: Multiple instances of the speech keyboard were running simultaneously, causing text to be typed multiple times
+- **Root Cause**: When starting a new instance, the previous instance wasn't being terminated, leading to multiple programs listening and typing at the same time
+- **Solution**: 
+  - Added `kill_existing_instances()` function that terminates any existing speech keyboard processes before starting a new one
+  - Uses `pgrep` on Linux to find python processes running speech_to_keyboard
+  - On Windows, uses psutil if available to find and terminate existing instances
+  - Ensures only one instance runs at a time by checking PIDs and killing others
+- **Implementation**:
+  - Applied to all versions: main, commands, enhanced, and lite
+  - Added necessary imports: `subprocess` and `signal`
+  - Function is called at the beginning of main() in all versions
+- **Result**: Clean, single-instance typing without duplication or overlap
+
 ## Future Development
 
 The project continues to evolve with a focus on:
+
+---
+
+*"Vibe coding: Where human creativity meets AI capability"* 
+
+## 2025-06-01
+
+### Kill Existing Instances Feature
+**User Request**: "Also I want to check and kill any existing instances of the speech keyboard before starting a new one."
+
+**Implementation**: Added `kill_existing_instances()` function to all speech keyboard versions that:
+- Detects running instances using process ID tracking
+- Gracefully terminates existing instances before starting new ones
+- Works cross-platform (Linux with pgrep, Windows with psutil)
+- Prevents multiple instances from running simultaneously
+
+**Technical Details**:
+- Uses `pgrep` on Linux to find python processes matching "speech_to_keyboard"
+- Falls back to psutil on Windows for process detection
+- Excludes current process from termination
+- Adds 0.5 second delay after termination for cleanup
+
+### Home/End Commands Observation
+**User Request**: "also add home and end to the commands"
+
+**Finding**: The home and end navigation commands were already implemented in the commands version:
+- "home" - Press Home key to jump to beginning of document
+- "end" - Press End key to jump to end of document
+- Both commands are included in navigation command filtering
+- Already documented in the help output
 
 ---
 

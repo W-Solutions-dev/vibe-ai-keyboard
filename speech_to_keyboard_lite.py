@@ -21,6 +21,8 @@ import os
 from collections import deque
 import platform
 import webrtcvad
+import subprocess
+import signal
 
 # Detect platform
 PLATFORM = platform.system()
@@ -182,6 +184,56 @@ class LiteSpeechKeyboard:
             self.audio.terminate()
             listener.stop()
 
+def kill_existing_instances():
+    """Kill any existing instances of speech keyboard before starting."""
+    # Get current process ID
+    current_pid = os.getpid()
+    
+    try:
+        # Find all python processes running speech_to_keyboard
+        result = subprocess.run(
+            ["pgrep", "-f", "python.*speech_to_keyboard"],
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode == 0:
+            pids = result.stdout.strip().split('\n')
+            for pid_str in pids:
+                if pid_str:
+                    pid = int(pid_str)
+                    # Don't kill ourselves
+                    if pid != current_pid:
+                        try:
+                            os.kill(pid, signal.SIGTERM)
+                            print(f"Killed existing instance (PID: {pid})")
+                            # Give it a moment to clean up
+                            time.sleep(0.5)
+                        except ProcessLookupError:
+                            # Process already gone
+                            pass
+                        except Exception as e:
+                            print(f"Failed to kill PID {pid}: {e}")
+    except FileNotFoundError:
+        # pgrep not available (Windows), try alternative method
+        if PLATFORM == "Windows":
+            try:
+                # Windows alternative using psutil if available
+                import psutil
+                for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+                    try:
+                        cmdline = ' '.join(proc.info['cmdline'] or [])
+                        if 'speech_to_keyboard' in cmdline and proc.info['pid'] != current_pid:
+                            proc.terminate()
+                            print(f"Killed existing instance (PID: {proc.info['pid']})")
+                            time.sleep(0.5)
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        pass
+            except ImportError:
+                print("psutil not available, cannot check for existing instances on Windows")
+    except Exception as e:
+        print(f"Error checking for existing instances: {e}")
+
 def main():
     parser = argparse.ArgumentParser(description="Speech-to-Text Keyboard")
     parser.add_argument(
@@ -198,6 +250,9 @@ def main():
     )
     
     args = parser.parse_args()
+    
+    # Kill any existing instances before starting
+    kill_existing_instances()
     
     app = LiteSpeechKeyboard(
         model_size=args.model,

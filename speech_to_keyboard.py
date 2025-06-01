@@ -27,6 +27,10 @@ import argparse
 import platform
 import logging
 from pathlib import Path
+import logging.handlers
+from datetime import datetime
+import subprocess
+import signal
 
 # Configure logging
 logging.basicConfig(
@@ -430,12 +434,67 @@ class SpeechToKeyboard:
             hotkey_listener.stop()
             print("Goodbye!")
 
+def kill_existing_instances():
+    """Kill any existing instances of speech keyboard before starting."""
+    # Get current process ID
+    current_pid = os.getpid()
+    
+    try:
+        # Find all python processes running speech_to_keyboard
+        result = subprocess.run(
+            ["pgrep", "-f", "python.*speech_to_keyboard"],
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode == 0:
+            pids = result.stdout.strip().split('\n')
+            for pid_str in pids:
+                if pid_str:
+                    pid = int(pid_str)
+                    # Don't kill ourselves
+                    if pid != current_pid:
+                        try:
+                            os.kill(pid, signal.SIGTERM)
+                            logger.info(f"Killed existing instance with PID {pid}")
+                            print(f"Killed existing instance (PID: {pid})")
+                            # Give it a moment to clean up
+                            time.sleep(0.5)
+                        except ProcessLookupError:
+                            # Process already gone
+                            pass
+                        except Exception as e:
+                            logger.warning(f"Failed to kill PID {pid}: {e}")
+    except FileNotFoundError:
+        # pgrep not available (Windows), try alternative method
+        if platform.system() == "Windows":
+            try:
+                # Windows alternative using psutil if available
+                import psutil
+                for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+                    try:
+                        cmdline = ' '.join(proc.info['cmdline'] or [])
+                        if 'speech_to_keyboard' in cmdline and proc.info['pid'] != current_pid:
+                            proc.terminate()
+                            logger.info(f"Killed existing instance with PID {proc.info['pid']}")
+                            print(f"Killed existing instance (PID: {proc.info['pid']})")
+                            time.sleep(0.5)
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        pass
+            except ImportError:
+                logger.warning("psutil not available, cannot check for existing instances on Windows")
+    except Exception as e:
+        logger.warning(f"Error checking for existing instances: {e}")
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description='Local Speech-to-Text Keyboard')
     parser.add_argument('--config', default='speech_config.json',
                         help='Path to configuration file (default: speech_config.json)')
     args = parser.parse_args()
+    
+    # Kill any existing instances before starting
+    kill_existing_instances()
     
     speech_keyboard = SpeechToKeyboard(config_file=args.config)
     speech_keyboard.run()

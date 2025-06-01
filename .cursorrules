@@ -79,7 +79,7 @@ The AI must maintain PROJECT_HISTORY.md to document:
 - Technical decisions and rationale
 - Collaboration milestones
 - User feedback and immediate responses
-- **Always use the actual current date (look it up via web search if needed) - NEVER make up dates**
+- **Always use the actual current date (get it via Linux `date` command) - NEVER make up dates**
 
 ### Privacy Implementation Documentation
 The AI must maintain PRIVACY_IMPLEMENTATION.md to document:

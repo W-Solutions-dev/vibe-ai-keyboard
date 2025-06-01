@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.3] - 2025-06-01
+
+### Added
+- Automatic instance management: kill existing instances before starting new ones
+  - Prevents multiple instances from running simultaneously 
+  - Works cross-platform (Linux with pgrep, Windows with psutil)
+  - Gracefully terminates existing processes with SIGTERM
+  - Applied to all speech keyboard versions
+
+### Documentation
+- Noted that home/end navigation commands were already implemented
+  - "home" - jumps to beginning of document
+  - "end" - jumps to end of document
+
 ## [0.4.2] - 2025-06-01
 
 ### Fixed

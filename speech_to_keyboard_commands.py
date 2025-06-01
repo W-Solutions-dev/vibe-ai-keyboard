@@ -25,6 +25,8 @@ import os
 import json
 from datetime import datetime
 import platform
+import subprocess
+import signal
 
 # Detect platform
 PLATFORM = platform.system()
@@ -188,6 +190,47 @@ class CommandHandler:
             except Exception as e:
                 logger.error(f"Failed to execute command: {e}", exc_info=True)
                 return text
+        
+        # Check for partial matches - if the cleaned text is very similar to a command
+        # This handles cases like "Go left." being recognized instead of "go left"
+        for cmd in self.SAFE_COMMANDS:
+            # Check if the entire text (after cleaning) is just the command
+            if text_cleaned == cmd:
+                logger.info(f"Executing command (exact match after cleaning): {cmd}")
+                try:
+                    self.SAFE_COMMANDS[cmd](self.keyboard)
+                    return ""
+                except Exception as e:
+                    logger.error(f"Failed to execute command: {e}", exc_info=True)
+            # Also check if text matches command with different punctuation/capitalization
+            elif text_lower.replace('.', '').replace(',', '').strip() == cmd:
+                logger.info(f"Executing command (fuzzy match): {cmd}")
+                try:
+                    self.SAFE_COMMANDS[cmd](self.keyboard)
+                    return ""
+                except Exception as e:
+                    logger.error(f"Failed to execute command: {e}", exc_info=True)
+        
+        # Filter out navigation commands that were spoken but not recognized as commands
+        # This prevents "go left", "go down" etc. from being typed as text
+        navigation_commands = [
+            "go left", "go right", "go up", "go down",
+            "page up", "page down", "home", "end",
+            "start of line", "end of line",
+            "tab left", "tab right", "next tab", "previous tab"
+        ]
+        
+        # Check if the cleaned text is a navigation command (even with variations)
+        for nav_cmd in navigation_commands:
+            if text_cleaned == nav_cmd or text_lower.replace('.', '').strip() == nav_cmd:
+                # Try to execute it one more time with exact matching
+                if nav_cmd in self.SAFE_COMMANDS:
+                    logger.info(f"Filtering out navigation command from text: {nav_cmd}")
+                    try:
+                        self.SAFE_COMMANDS[nav_cmd](self.keyboard)
+                    except Exception as e:
+                        logger.error(f"Failed to execute filtered command: {e}", exc_info=True)
+                return ""  # Don't type navigation commands as text
         
         # Check for command at the end of text
         for cmd, func in self.SAFE_COMMANDS.items():
@@ -636,6 +679,61 @@ class SecureSpeechKeyboard:
             logger.info("Shutdown complete")
             print("Goodbye!")
 
+def kill_existing_instances():
+    """Kill any existing instances of speech keyboard before starting."""
+    import subprocess
+    import signal
+    
+    # Get current process ID
+    current_pid = os.getpid()
+    
+    try:
+        # Find all python processes running speech_to_keyboard
+        result = subprocess.run(
+            ["pgrep", "-f", "python.*speech_to_keyboard"],
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode == 0:
+            pids = result.stdout.strip().split('\n')
+            for pid_str in pids:
+                if pid_str:
+                    pid = int(pid_str)
+                    # Don't kill ourselves
+                    if pid != current_pid:
+                        try:
+                            os.kill(pid, signal.SIGTERM)
+                            logger.info(f"Killed existing instance with PID {pid}")
+                            print(f"Killed existing instance (PID: {pid})")
+                            # Give it a moment to clean up
+                            time.sleep(0.5)
+                        except ProcessLookupError:
+                            # Process already gone
+                            pass
+                        except Exception as e:
+                            logger.warning(f"Failed to kill PID {pid}: {e}")
+    except FileNotFoundError:
+        # pgrep not available (Windows), try alternative method
+        if PLATFORM == "Windows":
+            try:
+                # Windows alternative using psutil if available
+                import psutil
+                for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+                    try:
+                        cmdline = ' '.join(proc.info['cmdline'] or [])
+                        if 'speech_to_keyboard' in cmdline and proc.info['pid'] != current_pid:
+                            proc.terminate()
+                            logger.info(f"Killed existing instance with PID {proc.info['pid']}")
+                            print(f"Killed existing instance (PID: {proc.info['pid']})")
+                            time.sleep(0.5)
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        pass
+            except ImportError:
+                logger.warning("psutil not available, cannot check for existing instances on Windows")
+    except Exception as e:
+        logger.warning(f"Error checking for existing instances: {e}")
+
 def main():
     parser = argparse.ArgumentParser(
         description="Secure Speech-to-Text Keyboard with optional voice commands"
@@ -675,6 +773,7 @@ def main():
     setup_logging(log_level=log_level, console_output=not args.quiet)
     
     try:
+        kill_existing_instances()
         app = SecureSpeechKeyboard(
             model_size=args.model,
             language=args.language,
