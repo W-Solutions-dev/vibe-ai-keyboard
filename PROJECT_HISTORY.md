@@ -300,6 +300,40 @@ System now only filters actual noise and filler words while allowing all normal 
 ### Lesson Learned
 When filtering false positives, be conservative - it's better to occasionally get noise than to block legitimate words the user wants to type.
 
+## January 6, 2025 - Multilingual Support Implementation
+
+### User Request
+"can we use multiple langs at once like en and nl?"
+
+**User Context**: User wanted to know if the system could handle multiple languages, specifically English and Dutch, potentially switching between them while speaking.
+
+### Technical Analysis
+- Whisper supports 100+ languages natively
+- Can auto-detect language when `language` parameter is `None`
+- Supports seamless switching between languages within the same session
+
+### Solution Implemented
+1. **Configuration Update**: Changed default `language` from `"en"` to `null` for auto-detection
+2. **Example Config**: Created `speech_config_multilang.json` with Dutch filler words added
+3. **Documentation**: Added comprehensive multilingual section to QUICKSTART.md
+
+### Technical Details
+```json
+"whisper": {
+    "language": null,  // Auto-detect any language
+    // Alternative: "nl" for Dutch only, "en" for English only
+}
+```
+
+### Features
+- Auto-detection of 100+ languages
+- Seamless switching between languages mid-sentence
+- Language-specific filler word filtering
+- Works with all model sizes (larger models better for non-English)
+
+### Result
+Users can now speak in any supported language or mix languages freely, with Whisper automatically detecting and transcribing in the appropriate language.
+
 ---
 
 *"Vibe coding: Where human creativity meets AI capability"* 

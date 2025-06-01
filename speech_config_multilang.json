@@ -25,7 +25,8 @@
     "filtering": {
         "min_text_length": 2,
         "false_positives": [
-            "", ".", "!", "?", "uh", "um", "hmm", "ah", "oh"
+            "", ".", "!", "?", "uh", "um", "hmm", "ah", "oh",
+            "eh", "euh", "hè"
         ]
     }
 } 

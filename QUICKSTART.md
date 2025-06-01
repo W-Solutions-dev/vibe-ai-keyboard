@@ -63,6 +63,52 @@ Edit `speech_config.json` to tune detection:
 - **small/medium**: Better accuracy, slower
 - **large**: Best accuracy, requires GPU
 
+## Multilingual Support
+
+### Auto Language Detection
+The default configuration now supports automatic language detection! You can speak in any language Whisper supports:
+```bash
+# Already configured for auto-detection
+python speech_to_keyboard.py
+```
+
+### Supported Languages
+Whisper supports 100+ languages including:
+- English, Dutch, German, French, Spanish, Italian
+- Chinese, Japanese, Korean, Arabic, Hindi
+- And many more!
+
+### Using Specific Language
+To force a specific language, edit `speech_config.json`:
+```json
+{
+    "whisper": {
+        "language": "nl"  // For Dutch only
+        // or
+        "language": "en"  // For English only
+        // or  
+        "language": null  // For auto-detection (default)
+    }
+}
+```
+
+### Mixed Language Example
+With auto-detection enabled, you can seamlessly switch:
+- "Hello, how are you?" → Types in English
+- "Hoe gaat het met je?" → Types in Dutch
+- "Comment allez-vous?" → Types in French
+
+### Multilingual Config
+Use the example multilingual config:
+```bash
+python speech_to_keyboard.py --config speech_config_multilang.json
+```
+
+### Tips for Multilingual Use
+- **Larger models** (small/medium) work better for non-English languages
+- **Clear pronunciation** helps with language detection
+- **Add language-specific filler words** to false_positives (e.g., "eh", "euh" for Dutch)
+
 ## Need Commands?
 For voice commands (use with caution):
 ```bash
