@@ -132,7 +132,7 @@ Maintain a `CHANGELOG.md` file:
 ```markdown
 # Changelog
 
-## [1.0.0] - 2024-01-15
+## [1.0.0] - 1 Jun 2025
 ### Added
 - Voice UI control with screenshot analysis
 - Text-to-speech feedback system

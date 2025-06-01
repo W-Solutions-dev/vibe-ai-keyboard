@@ -7,7 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.1] - 2025-01-06
+## [0.4.0] - 1 Jun 2025
+
+### Added
+- Comprehensive PRIVACY_IMPLEMENTATION.md document detailing HOW privacy is implemented
+- Specific code examples with line numbers showing privacy enforcement
+- Privacy verification methods and testing procedures
+- Privacy audit script example for automated verification
+- Reference to privacy implementation in README.md
+- Cursor rules for maintaining privacy documentation
+- Current date lookup requirement in cursor rules to prevent date errors
+
+### Fixed
+- GitHub issue templates now use proper naming convention (hyphenated lowercase)
+- PROJECT_HISTORY.md date accuracy - AI now required to look up actual dates
+
+### Changed
+- Enhanced documentation to show technical privacy implementation details
+- Cursor rules now enforce privacy documentation updates with code changes
+
+## [0.3.1] - 1 Jun 2025
 
 ### Added
 - Biometric sensor integration roadmap (heart rate, gesture recognition, eye tracking)
@@ -19,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced roadmap documentation with privacy-first approach for all features
 - Emphasized 100% local processing for biometric and video features
 
-## [0.3.0] - 2025-01-06
+## [0.3.0] - 1 Jun 2025
 
 ### Added
 - Automated issue resolution capability - AI can read GitHub issues, implement fixes, and push commits
@@ -34,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - All dates in PROJECT_HISTORY.md corrected to proper timeline
 
-## [0.2.1] - 2025-01-21
+## [0.2.1] - 1 Jun 2025
 
 ### Added
 - PROJECT_HISTORY.md documenting the complete development journey
@@ -47,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated vibe coding note to reflect the collaborative effort
 
-## [0.2.0] - 2025-01-21
+## [0.2.0] - 1 Jun 2025
 
 ### Added
 - Pre-buffer system to capture audio before speech detection (fixes first words being cut off)
@@ -67,7 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First words of speech being cut off during recognition
 - Configuration parameters are now centralized and easily adjustable
 
-## [0.1.0] - 2024-12-01
+## [0.1.0] - 1 Jun 2025
 
 ### Added
 - Core speech-to-text functionality with Whisper model
@@ -123,7 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Future Releases
 
-### [0.4.0] - TBD
+### [0.5.0] - TBD
 - PyPI package distribution
 - Docker container support
 - Desktop integration (system tray)

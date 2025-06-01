@@ -42,7 +42,7 @@ We welcome contributions and feedback! Please use our issue templates:
 - **Toggle On/Off**: Press F9 to enable/disable listening
 - **Voice Activity Detection**: Automatically detects when you start and stop speaking
 - **Low Latency**: Processes speech in real-time as you pause
-- **Privacy First**: All processing happens locally, your voice never leaves your computer
+- **Privacy First**: All processing happens locally, your voice never leaves your computer (see [Privacy Implementation](PRIVACY_IMPLEMENTATION.md) for technical details)
 - **Optional Voice Commands**: Safe keyboard control commands (disabled by default)
 
 ## Requirements

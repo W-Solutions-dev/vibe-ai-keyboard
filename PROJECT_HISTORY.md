@@ -367,7 +367,7 @@ Successfully demonstrated full autonomous issue resolution workflow:
 
 This test confirms the AI assistant can handle the complete development cycle from issue to resolution without human intervention beyond the initial request.
 
-## 6 Jan 2025 - Version 0.3.0 Release
+## 1 Jun 2025 - Version 0.3.0 Release
 
 ### Release Highlights
 - **Automated Issue Resolution**: AI can now autonomously read, fix, and close GitHub issues
@@ -382,7 +382,7 @@ This test confirms the AI assistant can handle the complete development cycle fr
 
 This release marks a significant milestone in the project's AI-driven development approach, enabling truly autonomous feature implementation and bug fixing.
 
-## 6 Jan 2025 - Human-in-the-Loop for Issue Resolution
+## 1 Jun 2025 - Human-in-the-Loop for Issue Resolution
 
 ### User Request
 "add an option for human in the loop for git issues before tackling all head on"
@@ -415,7 +415,7 @@ This release marks a significant milestone in the project's AI-driven developmen
 
 This addition ensures the AI remains a collaborative tool rather than an unsupervised agent, maintaining the "human in the loop" philosophy that defines this project.
 
-## 6 Jan 2025 - Cross-Platform Support Implementation
+## 1 Jun 2025 - Cross-Platform Support Implementation
 
 ### User Request
 "i want this project to be able to run on any linux machine and on any windows machine"
@@ -479,7 +479,7 @@ Users on both platforms enjoy the same features, performance, and user experienc
 ### Impact
 This update significantly expands the project's potential user base, allowing Windows users to benefit from local, privacy-focused speech-to-text capabilities without needing to switch operating systems or use WSL.
 
-## 6 Jan 2025 - Windows Testing Support & Vision Documentation
+## 1 Jun 2025 - Windows Testing Support & Vision Documentation
 
 ### User Request
 "add a note that windows support is not tested. elaborate that tickets are welcome. prepare an issue template that makes sense for us... also specify an original intent of the vibe developer: faster and smarter interacting with your OS thinking outside the box... update the opus requests to 1000... also use the correct date in prject history 1 jun 2025"
@@ -514,7 +514,7 @@ The vision emphasizes:
 ### Impact
 This update transforms the project documentation from a technical tool description to a vision-driven initiative that invites community participation. The issue templates lower the barrier for contributions, especially from Windows testers, while the vision statement inspires developers to think beyond current capabilities.
 
-## 6 Jan 2025 - Biometric Sensors Roadmap & Privacy Pledge
+## 1 Jun 2025 - Biometric Sensors Roadmap & Privacy Pledge
 
 ### User Request
 "add to the todo future implementation, sensors like heart rate, video (super privacy friendly all local)"
@@ -551,6 +551,38 @@ Released version 0.3.1 with enhanced roadmap documentation.
 
 ### Impact
 This update reinforces the project's core value of absolute privacy while expanding the vision to include cutting-edge biometric and visual features. The strong privacy pledge builds trust with users who may be concerned about sensor data collection.
+
+## 1 Jun 2025 - Windows Support Continuation
+**User Request**: "add a md document how we do this in the code, not only telling users thats its so. comprehensive!"
+
+**AI Response**: Created comprehensive Windows setup scripts, added Visual C++ Build Tools information, and improved cross-platform documentation
+
+**Implementation**:
+- Created PowerShell setup script
+- Added Windows-specific notes
+- Implemented platform detection
+
+## 1 Jun 2025 - Privacy Implementation Documentation
+**User Request**: "add a md document how we do this in the code, not only telling users thats its so. comprehensive! refer to it from the readme as well. add cursor rule to keep an eye on this and keep updating it."
+
+**AI Response**: Created comprehensive PRIVACY_IMPLEMENTATION.md document showing exactly HOW privacy is implemented in the code with specific line numbers and verification methods.
+
+**Implementation**:
+- Created detailed privacy implementation guide with code examples
+- Added verification methods and testing procedures
+- Updated README.md to reference the new document
+- Updated cursor rules to maintain both PRIVACY_IMPLEMENTATION.md and use actual dates
+- Fixed GitHub issue templates naming convention
+- Released version 0.4.0
+
+**Additional Fixes**:
+- Fixed PROJECT_HISTORY.md date accuracy requirement in cursor rules
+- Renamed issue templates to follow GitHub naming conventions (hyphenated lowercase)
+- Added privacy documentation maintenance requirements to cursor rules
+
+## Future Development
+
+The project continues to evolve with a focus on:
 
 ---
 

@@ -79,6 +79,16 @@ The AI must maintain PROJECT_HISTORY.md to document:
 - Technical decisions and rationale
 - Collaboration milestones
 - User feedback and immediate responses
+- **Always use the actual current date (look it up via web search if needed) - NEVER make up dates**
+
+### Privacy Implementation Documentation
+The AI must maintain PRIVACY_IMPLEMENTATION.md to document:
+- **Update whenever privacy-relevant code changes are made**
+- **Include specific line numbers and code examples**
+- **Document data flow for new features**
+- **Update verification methods when adding new functionality**
+- **Ensure all claims can be independently verified**
+- **Add new privacy testing procedures as needed**
 
 ### Example Workflow
 ```
