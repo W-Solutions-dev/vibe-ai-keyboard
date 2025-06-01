@@ -218,6 +218,43 @@ Edit by the "human": This is just great, this has been a journey to vibe code my
 ### Result
 Clean, uninterrupted text output that matches the behavior of the main application.
 
+## January 6, 2025 - Core Logic Unification
+
+### User Request
+"I need the lite and commands and enhanced to share the same logic as the main one as thats the one you worked on but you've not updated the others?"
+
+**User Context**: User noticed that improvements were made to the main version but other versions were missing these features.
+
+### Technical Analysis
+- **Main version**: Had all features (config, pre-buffer, filtering, calibration)
+- **Commands version**: Missing config support, pre-buffer, filtering, duplicate detection
+- **Enhanced version**: Missing pre-buffer system
+- **Lite version**: Missing most core features
+
+### Solution Implemented
+
+#### Commands Version Updates:
+- Added configuration file support
+- Implemented pre-buffer system for complete speech capture
+- Added false positive filtering from config
+- Added energy-based filtering with noise calibration
+- Implemented duplicate detection (2-second threshold)
+- Fixed console output interference
+- Removed automatic trailing space
+
+#### Enhanced Version Updates:
+- Added pre-buffer system
+- Updated configuration defaults
+
+#### Lite Version Updates:
+- Added configuration file support (with lite-specific defaults)
+- Implemented pre-buffer system (smaller buffer for performance)
+- Added false positive filtering
+- Kept it simpler (no VAD or calibration) to maintain "lite" nature
+
+### Result
+All versions now share the same core logic and features from the main version, ensuring consistent behavior and performance across the entire project.
+
 ---
 
 *"Vibe coding: Where human creativity meets AI capability"* 
