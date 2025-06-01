@@ -19,15 +19,13 @@
         "model_size": "base",
         "language": "en",
         "temperature": 0.1,
-        "no_speech_threshold": 0.6,
+        "no_speech_threshold": 0.7,
         "logprob_threshold": -1.0
     },
     "filtering": {
         "min_text_length": 2,
         "false_positives": [
-            "", ".", "!", "?", "Thank you.", "Thanks.", "thank you",
-            "Thanks for watching!", "you", "the", "uh", "um", "hmm",
-            "ah", "oh", "yeah", "yes", "no", "okay", "ok", "alright"
+            "", ".", "!", "?", "uh", "um", "hmm", "ah", "oh"
         ]
     }
 } 

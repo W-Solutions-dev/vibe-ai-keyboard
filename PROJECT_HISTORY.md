@@ -272,6 +272,34 @@ Added comprehensive rule to `.cursorrules` that mandates:
 ### Impact
 This ensures that future improvements, bug fixes, and features are properly propagated across all versions, preventing the divergence that necessitated the earlier unification effort.
 
+## January 6, 2025 - False Positives Configuration Refinement
+
+### User Request
+"why are all those words in the false positives i need to be able to use those i guess or at least yeah yues no okay ok alright etc not uh um hmm"
+
+**User Context**: User noticed that the false positives list was too aggressive, blocking common words that should be typed like "yes", "no", "okay", etc.
+
+### Technical Analysis
+- **Problem**: False positives list included useful words that users would want to type
+- **Impact**: Words like "yes", "no", "okay", "ok", "alright", "yeah" were being filtered out
+- **Root Cause**: Over-correction from earlier false detection issues
+
+### Solution Implemented
+Refined the false positives list to only include:
+- **Filler words**: "uh", "um", "hmm", "ah", "oh"
+- **Empty/punctuation**: "", ".", "!", "?"
+- **Known false detections**: "Thanks for watching!", specific garbled patterns
+
+Removed from false positives:
+- All common words: "yes", "no", "yeah", "okay", "ok", "alright"
+- Useful words: "the", "you", "thank you", "thanks"
+
+### Result
+System now only filters actual noise and filler words while allowing all normal conversational words to be typed.
+
+### Lesson Learned
+When filtering false positives, be conservative - it's better to occasionally get noise than to block legitimate words the user wants to type.
+
 ---
 
 *"Vibe coding: Where human creativity meets AI capability"* 
