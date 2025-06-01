@@ -136,6 +136,7 @@ AI:
 3. **False Detection Fix**: Advanced filtering and calibration
 4. **v0.2.0 Release**: Pre-buffer system for complete speech capture
 5. **Configuration System**: External parameter management
+6. **v0.2.1 Release**: Documentation and usability improvements
 
 ### User Feedback Integration
 
@@ -143,6 +144,22 @@ Throughout development, user feedback has been immediately integrated:
 - "Help me out here" → Immediate problem solving
 - "This is perfect push these changes" → Autonomous git workflow
 - "You always add a space at the end" → Quick fix implementation
+- "Add to the vibe note that it took around 500 cursor requests" → Documentation update
+- "Can you keep a summary of what i've asked you" → Created PROJECT_HISTORY.md
+- "Also add to the rules that we don't add 2 feats in 1 commit" → Updated commit guidelines
+
+### Latest Improvements (v0.2.1)
+
+#### Trailing Space Fix
+**Problem**: "you always add a space at the end of the output, which i don't need"
+
+**Solution**: Removed automatic trailing space after recognized text while preserving spaces between words
+
+#### Documentation Enhancements
+- Created PROJECT_HISTORY.md to chronicle the development journey
+- Updated README.md to acknowledge ~500 Claude Opus requests
+- Added commit rule: "One feature per commit" to .cursorrules
+- Enhanced development history tracking requirements
 
 ### The Numbers
 
@@ -151,7 +168,7 @@ Throughout development, user feedback has been immediately integrated:
 - **Lines of Code**: 2000+ lines
 - **Documentation**: 1000+ lines
 - **Commits**: 20+ structured commits
-- **Version**: Currently at v0.2.0
+- **Version**: Currently at v0.2.1
 
 ### Future Vision
 
