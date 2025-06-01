@@ -1,0 +1,107 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+
+# Testing
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Logs
+*.log
+logs/runtime.log*
+logs/setup.log*
+
+# Audio files (from testing)
+*.wav
+*.mp3
+*.flac
+
+# Whisper models cache
+~/.cache/whisper/
+models/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+.setup_state
+test_recording.wav
+
+# Documentation builds
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# Package files
+*.deb
+*.snap
+*.AppImage
+*.tar.gz
+*.zip
+
+# Docker
+.dockerignore
+
+# Secrets and credentials
+.env
+.env.*
+secrets/
+credentials/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Database
+*.db
+*.sqlite
+*.sqlite3 

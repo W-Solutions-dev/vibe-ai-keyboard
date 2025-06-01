@@ -1,0 +1,26 @@
+[Unit]
+Description=Local Speech-to-Text Keyboard Service
+After=graphical.target
+
+[Service]
+Type=simple
+# Update these paths to match your installation
+WorkingDirectory=/home/YOUR_USERNAME/speech-to-text-keyboard
+ExecStart=/home/YOUR_USERNAME/speech-to-text-keyboard/venv/bin/python /home/YOUR_USERNAME/speech-to-text-keyboard/speech_to_keyboard.py
+Restart=on-failure
+RestartSec=5
+
+# Run as your user (replace with your username)
+User=YOUR_USERNAME
+Group=YOUR_USERNAME
+
+# Environment
+Environment="DISPLAY=:0"
+Environment="XAUTHORITY=/home/YOUR_USERNAME/.Xauthority"
+Environment="PULSE_RUNTIME_PATH=/run/user/1000/pulse"
+
+# Security
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target 

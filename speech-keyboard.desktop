@@ -1,0 +1,16 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Speech-to-Text Keyboard
+Comment=Local speech recognition that types like a keyboard
+Icon=audio-input-microphone
+Terminal=true
+Categories=Utility;Accessibility;
+
+# Update this path to match your installation directory
+Exec=/home/YOUR_USERNAME/speech-to-text-keyboard/venv/bin/python /home/YOUR_USERNAME/speech-to-text-keyboard/speech_to_keyboard.py
+
+# For the lightweight version, use this instead:
+# Exec=/home/YOUR_USERNAME/speech-to-text-keyboard/venv/bin/python /home/YOUR_USERNAME/speech-to-text-keyboard/speech_to_keyboard_lite.py
+
+Path=/home/YOUR_USERNAME/speech-to-text-keyboard/ 

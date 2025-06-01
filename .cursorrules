@@ -1,0 +1,178 @@
+# Speech-to-Text Keyboard Project Guidelines
+
+## Project Overview
+A local, privacy-focused speech-to-text system that acts like a USB keyboard, with optional voice command support. All processing happens locally using OpenAI's Whisper model.
+
+## Core Principles
+1. **Privacy First**: All processing must be local, no cloud services
+2. **Security by Default**: Commands disabled by default, whitelist approach
+3. **User Control**: Clear visual/audio feedback, easy toggle on/off
+4. **Accessibility**: Works system-wide in any application
+
+## Code Style Guidelines
+
+### Python
+- Use Python 3.8+ features
+- Follow PEP 8 with 100 character line limit
+- Type hints for function parameters and returns
+- Docstrings for all classes and public methods
+- Use f-strings for formatting
+
+### Logging
+- Always use the logging module, never print() for debugging
+- Log levels: DEBUG (verbose), INFO (standard), WARNING (issues), ERROR (failures)
+- Include context in log messages
+- Separate setup.log and runtime.log files
+
+### Error Handling
+- Graceful degradation - never crash the entire system
+- Catch specific exceptions, not bare except
+- Log errors with full context
+- Provide user-friendly error messages
+
+## Architecture Patterns
+
+### Security Model
+```python
+# Always use whitelist approach for commands
+SAFE_COMMANDS = {
+    "command_name": command_function,
+}
+
+# Block dangerous patterns explicitly
+BLOCKED_PATTERNS = [
+    r"pattern_regex",
+]
+```
+
+### Audio Processing
+- Use Voice Activity Detection (VAD) before processing
+- Buffer audio until silence detected
+- Process in separate thread to avoid blocking
+- Queue-based communication between threads
+
+### Configuration
+- Use argparse for CLI options
+- Environment variables for system paths
+- JSON/YAML for complex configuration
+- Sensible defaults for all options
+
+## File Structure
+```
+speech-to-text-keyboard/
+├── speech_to_keyboard.py          # Main application
+├── speech_to_keyboard_commands.py # Version with commands
+├── speech_to_keyboard_lite.py     # Lightweight version
+├── requirements.txt               # Python dependencies
+├── setup.sh                      # Idempotent setup script
+├── test_helper.sh               # Interactive test suite
+├── test_setup.py                # Component verification
+├── .cursorrules                 # This file
+├── README.md                    # User documentation
+├── QUICKSTART.md               # Quick reference
+└── logs/                       # Log directory
+    ├── setup.log
+    └── runtime.log
+```
+
+## Development Workflow
+
+### Adding New Features
+1. Create feature branch
+2. Update relevant documentation
+3. Add tests in test_setup.py
+4. Implement with logging
+5. Test with test_helper.sh
+6. Update QUICKSTART.md if needed
+
+### Testing Checklist
+- [ ] Audio device detection works
+- [ ] Microphone captures audio
+- [ ] Whisper model loads
+- [ ] Text is typed correctly
+- [ ] Commands execute safely (if enabled)
+- [ ] F9 toggle works
+- [ ] Clean shutdown on Ctrl+C
+
+### Common Issues & Solutions
+- **ALSA warnings**: Normal on Linux, can be suppressed
+- **High CPU**: Use smaller model or GPU acceleration
+- **No audio**: Check permissions and device selection
+- **Import errors**: Verify virtual environment activation
+
+## Voice Command Guidelines
+
+### Adding New Commands
+1. Add to SAFE_COMMANDS dictionary only
+2. Test for security implications
+3. Log command execution
+4. Provide feedback to user
+5. Handle errors gracefully
+
+### Command Naming
+- Use natural language: "new line" not "newline"
+- Support variations: "press enter" and "new line"
+- Avoid technical jargon
+- Keep commands short and clear
+
+## Performance Optimization
+
+### Model Selection
+- tiny: Fast, less accurate, good for testing
+- base: Default, balanced performance
+- small/medium: Better accuracy, higher resource use
+- large: Best accuracy, requires GPU
+
+### Resource Management
+- Stream audio processing
+- Release resources on pause
+- Use appropriate chunk sizes
+- Consider battery usage on laptops
+
+## Security Considerations
+
+### Never Allow
+- System commands (shutdown, reboot)
+- Privilege escalation (sudo, admin)
+- Window management (Alt+F4)
+- Script execution
+- File system access
+
+### Always Require
+- Explicit user activation (F9)
+- Visual confirmation of actions
+- Logging of all commands
+- Whitelist validation
+
+## Future Development Areas
+
+### High Priority
+1. Visual UI control with screenshots
+2. Text-to-speech feedback
+3. Enhanced logging system
+4. GPU acceleration support
+
+### Medium Priority
+1. Multi-language support improvements
+2. Custom wake words
+3. Profile management
+4. Cloud model integration (optional)
+
+### Low Priority
+1. Mobile app companion
+2. Web interface
+3. Plugin system
+4. Voice training
+
+## Git Commit Guidelines
+- Prefix: feat:, fix:, docs:, test:, refactor:
+- Present tense: "Add feature" not "Added feature"
+- Reference issues when applicable
+- Keep commits atomic and focused
+
+## Documentation Standards
+- Update README.md for major features
+- Keep QUICKSTART.md concise
+- Include code examples
+- Document security implications
+- Add inline comments for complex logic 
