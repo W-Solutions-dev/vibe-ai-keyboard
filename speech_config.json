@@ -1,0 +1,32 @@
+{
+    "audio": {
+        "rate": 16000,
+        "chunk_size": 480,
+        "channels": 1
+    },
+    "detection": {
+        "vad_aggressiveness": 3,
+        "silence_threshold_chunks": 30,
+        "min_speech_chunks": 10,
+        "energy_threshold_multiplier": 1.5,
+        "consecutive_speech_chunks": 3,
+        "calibration_duration_seconds": 2
+    },
+    "whisper": {
+        "model_size": "base",
+        "language": "en",
+        "temperature": 0.1,
+        "no_speech_threshold": 0.6,
+        "logprob_threshold": -1.0
+    },
+    "filtering": {
+        "min_text_length": 3,
+        "false_positives": [
+            "", ".", "!", "?", 
+            "Thank you.", "Thanks.", "thank you", "thanks",
+            "Thanks for watching!", "Thank you for watching!",
+            "you", "the", "uh", "um", "hmm", "mm",
+            "[Music]", "[Applause]", "[Laughter]"
+        ]
+    }
+} 

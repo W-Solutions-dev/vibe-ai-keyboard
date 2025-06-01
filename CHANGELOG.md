@@ -22,6 +22,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Lite version (fast, minimal features)
 - Project documentation (README, QUICKSTART, .cursorrules)
 - Versioning and release strategy
+- Enhanced speech detection with configurable sensitivity settings
+- Automatic noise floor calibration on startup
+- Energy-based filtering to prevent false detections from breathing and keyboard sounds
+- Configuration file support (speech_config.json) for easy tuning
+- Enhanced version (speech_to_keyboard_enhanced.py) with advanced filtering
+- Minimum speech duration requirement to filter out short sounds
+- Consecutive speech chunk validation for more reliable detection
+- Expanded false positive filtering with common misrecognized phrases
+- Setuptools added to requirements for better compatibility
+
+### Changed
+- Increased VAD aggressiveness from 2 to 3 for better noise rejection
+- Increased silence threshold from 15 to 30 chunks (~900ms) for more natural speech detection
+- Improved Whisper transcription parameters with stricter thresholds
+- Updated QUICKSTART.md with troubleshooting guide for false detections
+
+### Fixed
+- False detection of breathing sounds and keyboard noise
+- Random text output like "thank you" from ambient noise
+- Missing pkg_resources dependency for WebRTC VAD
 
 ### Security
 - Commands disabled by default
