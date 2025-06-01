@@ -587,6 +587,18 @@ This update reinforces the project's core value of absolute privacy while expand
 - **Implementation**: Applied fix across all speech keyboard versions to maintain consistency
 - **Version**: Released as 0.4.1
 
+## 2025-06-01: Voice Commands Not Working & Behavior Improvement
+- **User Report**: "This seems not to be working, the comments" (referring to voice commands not executing)
+- **Issue 1**: Commands like "New line." and "Select all." were being typed instead of executed due to Whisper adding capitalization and punctuation
+- **Solution 1**: Made command matching case-insensitive and strip common punctuation before matching
+- **User Feedback**: "new line should be shift enter not enter??? and enter should be current newline?"
+- **Issue 2**: "new line" command was unintuitive - it should create a soft line break, not a new paragraph
+- **Solution 2**: 
+  - Changed "new line" to use Shift+Enter (soft line break within paragraph)
+  - Added "enter" as a direct command for regular Enter key (new paragraph)
+  - Updated documentation to clarify the distinction
+- **Result**: Voice commands now work reliably regardless of Whisper's formatting, and behave more intuitively
+
 ## Future Development
 
 The project continues to evolve with a focus on:

@@ -15,6 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Prevents sentences from being concatenated without spaces
   - Tracks last typed text to determine spacing needs
   - Applied fix to all speech keyboard versions
+- Voice command recognition with punctuation and capitalization
+  - Commands now work when Whisper adds punctuation (e.g., "New line.")
+  - Case-insensitive command matching
+  - Strips common punctuation (.!?,;:) before matching commands
+
+### Changed
+- "new line" command now uses Shift+Enter for soft line break
+- Added "enter" as a direct command for regular Enter key
+- Improved voice command documentation clarity
 
 ## [0.4.0] - 1 Jun 2025
 
