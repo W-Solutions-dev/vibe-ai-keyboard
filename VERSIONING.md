@@ -12,7 +12,7 @@ We use [Semantic Versioning](https://semver.org/) (SemVer) with the format `MAJO
 - **MINOR**: New features in a backwards-compatible manner
 - **PATCH**: Backwards-compatible bug fixes
 
-Current version: `0.2.0` (Pre-release/Beta)
+Current version: `0.2.1` (Pre-release/Beta)
 
 ## Branch Strategy
 

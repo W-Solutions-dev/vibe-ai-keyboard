@@ -6,7 +6,7 @@ Press F9 to toggle listening on/off.
 Press Ctrl+C to exit.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 import sys
 import time
@@ -292,7 +292,7 @@ class SpeechToKeyboard:
             if text and text not in self.false_positives and len(text) > self.min_text_length:
                 print(f" [{text}]")
                 # Type the recognized text
-                self.keyboard_controller.type(text + " ")
+                self.keyboard_controller.type(text)
             else:
                 print(" [Filtered out]")
                 

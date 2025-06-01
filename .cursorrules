@@ -38,6 +38,16 @@ When managing this project, the AI MUST:
 - Create appropriate git tags
 - Follow the branch strategy outlined in VERSIONING.md
 - Never wait for human confirmation on git operations
+- **Update PROJECT_HISTORY.md with significant user requests and development milestones**
+
+### Development History Tracking
+The AI must maintain PROJECT_HISTORY.md to document:
+- User requests that shaped the project
+- Major feature implementations
+- Problem-solving approaches
+- Technical decisions and rationale
+- Collaboration milestones
+- User feedback and immediate responses
 
 ### Example Workflow
 ```
@@ -114,6 +124,7 @@ speech-to-text-keyboard/
 ├── .cursorrules                 # This file
 ├── README.md                    # User documentation
 ├── QUICKSTART.md               # Quick reference
+├── PROJECT_HISTORY.md          # Development journey documentation
 └── logs/                       # Log directory
     ├── setup.log
     └── runtime.log
