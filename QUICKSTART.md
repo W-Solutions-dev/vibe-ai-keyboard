@@ -116,11 +116,24 @@ python speech_to_keyboard_commands.py --enable-commands
 python speech_to_keyboard_commands.py --enable-commands
 ```
 
-**Available commands:**
-- "new line" or "press enter"
-- "press space", "press tab"
-- "copy", "paste", "cut"
-- "select all", "undo", "redo"
+When using `speech_to_keyboard_commands.py` with `--enable-commands`:
+
+| Say | Action |
+|-----|--------|
+| "new line" | Shift+Enter (soft line break) |
+| "enter" or "press enter" | Enter (new paragraph) |
+| "press tab" | Tab key |
+| "press space" | Space key |
+| "copy" | Ctrl+C |
+| "paste" | Ctrl+V |
+| "cut" | Ctrl+X |
+| "select all" | Ctrl+A |
+| "undo" | Ctrl+Z |
+| "redo" | Ctrl+Y |
+| "go left/right/up/down" | Arrow keys |
+| "page up/down" | Page navigation |
+| "home/end" | Line navigation |
+| "backspace/delete" | Text deletion |
 
 ## 📊 Performance Options
 

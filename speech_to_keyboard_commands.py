@@ -101,7 +101,8 @@ class CommandHandler:
     # Define allowed commands (whitelist approach for security)
     SAFE_COMMANDS = {
         # Text navigation
-        "new line": lambda kb: kb.press(Key.enter),
+        "new line": lambda kb: kb.press(Key.shift, Key.enter),  # Soft line break
+        "enter": lambda kb: kb.press(Key.enter),  # Regular enter/new paragraph
         "press enter": lambda kb: kb.press(Key.enter),
         "press tab": lambda kb: kb.press(Key.tab),
         "press space": lambda kb: kb.press(Key.space),
@@ -161,13 +162,16 @@ class CommandHandler:
         if not self.is_command_safe(text):
             return ""  # Block unsafe commands
         
+        # Clean the text for command matching: lowercase and remove common punctuation
         text_lower = text.lower().strip()
+        # Remove trailing punctuation for command matching
+        text_cleaned = text_lower.rstrip('.!?,;:')
         
         # Check if it's a command
-        if text_lower in self.SAFE_COMMANDS:
-            logger.info(f"Executing command: {text_lower}")
+        if text_cleaned in self.SAFE_COMMANDS:
+            logger.info(f"Executing command: {text_cleaned}")
             try:
-                self.SAFE_COMMANDS[text_lower](self.keyboard)
+                self.SAFE_COMMANDS[text_cleaned](self.keyboard)
                 return ""  # Don't type the command text
             except Exception as e:
                 logger.error(f"Failed to execute command: {e}", exc_info=True)
@@ -175,9 +179,9 @@ class CommandHandler:
         
         # Check for command at the end of text
         for cmd, func in self.SAFE_COMMANDS.items():
-            if text_lower.endswith(cmd):
+            if text_cleaned.endswith(cmd):
                 # Type the text before the command
-                prefix = text[:-len(cmd)].rstrip()
+                prefix = text[:-(len(cmd) + (len(text_lower) - len(text_cleaned)))].rstrip()
                 if prefix:
                     return prefix
                 # Execute the command
@@ -578,7 +582,7 @@ class SecureSpeechKeyboard:
         
         if self.command_handler.enabled:
             print("\nVoice Commands Available:")
-            print("- 'new line' or 'press enter'")
+            print("- 'new line' (Shift+Enter) or 'enter'/'press enter' (Enter)")
             print("- 'press tab', 'press space'")
             print("- 'copy', 'paste', 'cut'")
             print("- 'select all', 'undo', 'redo'")
