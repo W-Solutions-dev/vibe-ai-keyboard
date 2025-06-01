@@ -699,3 +699,27 @@ The project continues to evolve with a focus on:
 ---
 
 *"Vibe coding: Where human creativity meets AI capability"* 
+
+## June 01, 2025 - GPL v3 License Adoption
+
+**User Request**: "what license shall we add? I'm an open source advocate"
+
+The user expressed their commitment to open source principles, leading to a thoughtful discussion about license options. After presenting various licenses (MIT, Apache 2.0, GPL v3, MPL 2.0), the user chose **GPL v3** for its strong copyleft protection.
+
+**Implementation**:
+- Added full GPL v3 license text in LICENSE file
+- Created COPYING file (traditional for GPL projects)
+- Added GPL v3 copyright headers to all main Python files
+- Updated README with comprehensive license information
+- Ensured the project's commitment to user freedom is legally protected
+
+This choice reflects the project's core values:
+- 🔓 Ensuring the software remains free and open
+- 🛡️ Protecting user privacy and freedom
+- 🤝 Encouraging community contributions
+- 📖 Guaranteeing source code availability
+
+The GPL v3 license aligns perfectly with the project's privacy-first philosophy and the user's open source advocacy.
+
+## December 30, 2024 - Navigation Command Enhancement
+// ... existing code ...

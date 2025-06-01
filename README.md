@@ -44,6 +44,8 @@ We welcome contributions and feedback! Please use our issue templates:
 - **Low Latency**: Processes speech in real-time as you pause
 - **Privacy First**: All processing happens locally, your voice never leaves your computer (see [Privacy Implementation](PRIVACY_IMPLEMENTATION.md) for technical details)
 - **Optional Voice Commands**: Safe keyboard control commands (disabled by default)
+- **Native Typing**: Acts like a USB keyboard - no special drivers needed
+- **Visual Feedback**: Clear UI indicators for active/paused state
 
 ## Requirements
 
@@ -342,9 +344,18 @@ python test_setup.py  # Run component tests
 
 ## License
 
-This project uses:
-- OpenAI Whisper (MIT License)
-- Various Python libraries under their respective licenses
+This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
+
+This means you are free to:
+- ✅ Use this software for any purpose
+- ✅ Change the software to suit your needs
+- ✅ Share the software with your friends and neighbors
+- ✅ Share the changes you make
+
+Under the following conditions:
+- 📋 You must include the license and copyright notice with each and every distribution
+- 🔓 You must share any modifications under the same license
+- 📖 You must make the source code available when you distribute the software
 
 ## Automated Development
 
