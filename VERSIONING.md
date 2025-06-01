@@ -8,11 +8,11 @@ This document outlines the versioning and release strategy for the Speech-to-Tex
 
 We use [Semantic Versioning](https://semver.org/) (SemVer) with the format `MAJOR.MINOR.PATCH`:
 
-- **MAJOR**: Breaking changes that require user intervention
-- **MINOR**: New features that are backwards compatible
-- **PATCH**: Bug fixes and minor improvements
+- **MAJOR**: Incompatible API changes or major feature overhauls
+- **MINOR**: New features in a backwards-compatible manner
+- **PATCH**: Backwards-compatible bug fixes
 
-Current version: `0.1.0` (Pre-release/Beta)
+Current version: `0.2.0` (Pre-release/Beta)
 
 ## Branch Strategy
 
