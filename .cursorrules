@@ -3,11 +3,65 @@
 ## Project Overview
 A local, privacy-focused speech-to-text system that acts like a USB keyboard, with optional voice command support. All processing happens locally using OpenAI's Whisper model.
 
+> **🌟 Note**: This project is 100% vibe coded with a human in the loop. Every feature is crafted through the collaborative dance between human creativity and AI assistance, ensuring both innovation and practical usability.
+
 ## Core Principles
 1. **Privacy First**: All processing must be local, no cloud services
 2. **Security by Default**: Commands disabled by default, whitelist approach
 3. **User Control**: Clear visual/audio feedback, easy toggle on/off
 4. **Accessibility**: Works system-wide in any application
+
+## Autonomous Versioning & Git Management
+
+### AI-Driven Git Workflow
+This project uses an autonomous versioning system where:
+- **Human Role**: Vibe code, provide instructions, create features
+- **AI Role**: Handle ALL git operations, versioning, and release management
+
+### How It Works
+1. Human provides feature/fix instructions
+2. AI implements the changes
+3. AI handles all git operations:
+   - Creating appropriate branches
+   - Writing conventional commit messages
+   - Managing version numbers
+   - Updating CHANGELOG.md
+   - Creating tags and releases
+   - Maintaining branch hygiene
+
+### Versioning Instructions for AI
+When managing this project, the AI MUST:
+- Follow semantic versioning strictly (MAJOR.MINOR.PATCH)
+- Use conventional commits for all messages
+- Update version numbers in all relevant files
+- Maintain comprehensive CHANGELOG.md entries
+- Create appropriate git tags
+- Follow the branch strategy outlined in VERSIONING.md
+- Never wait for human confirmation on git operations
+- **Update PROJECT_HISTORY.md with significant user requests and development milestones**
+
+### Development History Tracking
+The AI must maintain PROJECT_HISTORY.md to document:
+- User requests that shaped the project
+- Major feature implementations
+- Problem-solving approaches
+- Technical decisions and rationale
+- Collaboration milestones
+- User feedback and immediate responses
+
+### Example Workflow
+```
+Human: "Add voice UI control feature"
+AI: 
+1. Creates feature/voice-ui-control branch
+2. Implements the feature
+3. Commits with "feat(ui): add voice-controlled UI automation"
+4. Updates CHANGELOG.md
+5. Manages PR/merge when ready
+6. Tags release if appropriate
+```
+
+The human should NEVER need to run git commands manually. The AI handles everything.
 
 ## Code Style Guidelines
 
@@ -70,6 +124,7 @@ speech-to-text-keyboard/
 ├── .cursorrules                 # This file
 ├── README.md                    # User documentation
 ├── QUICKSTART.md               # Quick reference
+├── PROJECT_HISTORY.md          # Development journey documentation
 └── logs/                       # Log directory
     ├── setup.log
     └── runtime.log
@@ -169,6 +224,8 @@ speech-to-text-keyboard/
 - Present tense: "Add feature" not "Added feature"
 - Reference issues when applicable
 - Keep commits atomic and focused
+- **One feature per commit**: Never combine multiple features in a single commit
+- Each significant change should have its own commit for clear history
 
 ## Documentation Standards
 - Update README.md for major features

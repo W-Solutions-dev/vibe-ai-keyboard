@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-01-21
+
+### Added
+- PROJECT_HISTORY.md documenting the complete development journey
+- Development history tracking requirements in .cursorrules
+- Acknowledgment of ~500 Claude Opus requests in README
+
+### Fixed
+- Removed automatic trailing space after recognized text
+
+### Changed
+- Updated vibe coding note to reflect the collaborative effort
+
+## [0.2.0] - 2025-01-21
+
+### Added
+- Pre-buffer system to capture audio before speech detection (fixes first words being cut off)
+- Configurable pre-buffer size in speech_config.json (default: 15 chunks = ~450ms)
+- test_prebuffer.py utility to visualize and test pre-buffer behavior
+- Configuration file support (speech_config.json) for all tunable parameters
+- Instant speech detection (reduced from 3 chunks to 1 chunk threshold)
+- Dynamic configuration loading with sensible defaults
+
+### Changed
+- Speech detection now starts immediately on first detected speech chunk
+- Main script now uses configuration file for all parameters
+- Added argparse support for custom config file paths
+- Updated documentation with pre-buffer troubleshooting guide
+
+### Fixed
+- First words of speech being cut off during recognition
+- Configuration parameters are now centralized and easily adjustable
+
+## [0.1.0] - 2024-12-01
+
 ### Added
 - Core speech-to-text functionality with Whisper model
 - Voice activity detection for automatic speech capture
@@ -22,20 +57,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Lite version (fast, minimal features)
 - Project documentation (README, QUICKSTART, .cursorrules)
 - Versioning and release strategy
+- Enhanced speech detection with configurable sensitivity settings
+- Automatic noise floor calibration on startup
+- Energy-based filtering to prevent false detections from breathing and keyboard sounds
+- Enhanced version (speech_to_keyboard_enhanced.py) with advanced filtering
+- Minimum speech duration requirement to filter out short sounds
+- Consecutive speech chunk validation for more reliable detection
+- Expanded false positive filtering with common misrecognized phrases
+- Setuptools added to requirements for better compatibility
+
+### Changed
+- Increased VAD aggressiveness from 2 to 3 for better noise rejection
+- Increased silence threshold from 15 to 30 chunks (~900ms) for more natural speech detection
+- Improved Whisper transcription parameters with stricter thresholds
+- Updated QUICKSTART.md with troubleshooting guide for false detections
+
+### Fixed
+- False detection of breathing sounds and keyboard noise
+- Random text output like "thank you" from ambient noise
+- Missing pkg_resources dependency for WebRTC VAD
 
 ### Security
 - Commands disabled by default
 - Whitelist approach for allowed commands
 - Blocked dangerous operations (Alt+F4, shutdown, etc.)
 - Command execution logging for audit trail
-
-## [0.1.0] - 2024-12-01 (Planned)
-
-### Added
-- Initial beta release
-- Basic speech-to-text keyboard functionality
-- Setup and installation scripts
-- Documentation and quick start guide
 
 ---
 
@@ -50,12 +96,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Future Releases
 
-### [0.2.0] - TBD
+### [0.3.0] - TBD
 - Voice UI control with screenshot analysis
 - Text-to-speech feedback system
 - GPU acceleration support
 
-### [0.3.0] - TBD
+### [0.4.0] - TBD
 - PyPI package distribution
 - Docker container support
 - Desktop integration (system tray)

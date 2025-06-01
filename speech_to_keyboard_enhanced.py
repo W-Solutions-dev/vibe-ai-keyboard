@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Local Speech-to-Text Keyboard
+Enhanced Local Speech-to-Text Keyboard with Configuration Support
 Converts speech to text and types it as if it were keyboard input.
 Press F9 to toggle listening on/off.
 Press Ctrl+C to exit.
 """
 
-__version__ = "0.2.1"
-
 import sys
 import time
 import threading
 import queue
+import json
+import os
 import numpy as np
 import pyaudio
 import whisper
@@ -19,24 +19,20 @@ from pynput import keyboard
 from pynput.keyboard import Controller, Key
 import webrtcvad
 from collections import deque
-import json
-import os
-import argparse
 
 class SpeechToKeyboard:
     def __init__(self, config_file="speech_config.json"):
         """
-        Initialize the speech-to-text keyboard.
+        Initialize the speech-to-text keyboard with configuration file.
         
         Args:
-            config_file: Path to configuration file
+            config_file: Path to JSON configuration file
         """
         # Load configuration
-        self.config = self.load_config(config_file)
+        self.load_config(config_file)
         
         print(f"Loading Whisper {self.config['whisper']['model_size']} model... This may take a moment on first run.")
         self.model = whisper.load_model(self.config['whisper']['model_size'])
-        self.language = self.config['whisper']['language']
         
         # Audio settings from config
         self.RATE = self.config['audio']['rate']
@@ -45,7 +41,7 @@ class SpeechToKeyboard:
         self.CHANNELS = self.config['audio']['channels']
         
         # Voice activity detection
-        self.vad = webrtcvad.Vad(self.config['speech_detection']['vad_aggressiveness'])
+        self.vad = webrtcvad.Vad(self.config['detection']['vad_aggressiveness'])
         
         # Audio stream
         self.audio = pyaudio.PyAudio()
@@ -59,44 +55,36 @@ class SpeechToKeyboard:
         self.running = True
         self.audio_queue = queue.Queue()
         
-        # Audio buffer settings from config
-        self.speech_buffer = deque(maxlen=100)
-        self.silence_threshold = self.config['speech_detection']['silence_threshold_chunks']
-        self.min_speech_chunks = self.config['speech_detection']['min_speech_chunks']
-        
-        # Pre-buffer to capture audio before speech detection
-        self.pre_buffer_size = self.config['speech_detection']['pre_buffer_chunks']
-        self.pre_buffer = deque(maxlen=self.pre_buffer_size)
+        # Detection parameters from config
+        self.silence_threshold = self.config['detection']['silence_threshold_chunks']
+        self.min_speech_chunks = self.config['detection']['min_speech_chunks']
+        self.energy_multiplier = self.config['detection']['energy_threshold_multiplier']
+        self.consecutive_speech = self.config['detection']['consecutive_speech_chunks']
+        self.calibration_seconds = self.config['detection']['calibration_duration_seconds']
         
         # Energy-based filtering
         self.energy_threshold = 0.01
         self.calibrating = True
         self.noise_levels = deque(maxlen=50)
         
-        # Load filtering settings
-        self.false_positives = set(self.config['filtering']['false_positives'])
-        self.min_text_length = self.config['filtering']['min_text_length']
-        
         print(f"Model loaded successfully!")
-        print(f"Pre-buffer: {self.pre_buffer_size} chunks (~{self.pre_buffer_size * 30}ms)")
-        print("Calibrating noise level... Please remain quiet for 2 seconds.")
-    
+        print(f"Configuration loaded from {config_file}")
+        print(f"Calibrating noise level... Please remain quiet for {self.calibration_seconds} seconds.")
+        
     def load_config(self, config_file):
-        """Load configuration from file, use defaults if not found."""
+        """Load configuration from JSON file."""
         default_config = {
             "audio": {
                 "rate": 16000,
                 "chunk_size": 480,
                 "channels": 1
             },
-            "speech_detection": {
+            "detection": {
                 "vad_aggressiveness": 3,
-                "pre_buffer_chunks": 15,
                 "silence_threshold_chunks": 30,
                 "min_speech_chunks": 10,
                 "energy_threshold_multiplier": 1.5,
-                "noise_floor_multiplier": 3,
-                "speech_detection_threshold": 1,
+                "consecutive_speech_chunks": 3,
                 "calibration_duration_seconds": 2
             },
             "whisper": {
@@ -107,24 +95,41 @@ class SpeechToKeyboard:
                 "logprob_threshold": -1.0
             },
             "filtering": {
-                "min_text_length": 2,
-                "false_positives": [
-                    "", ".", "!", "?", "Thank you.", "Thanks.", "thank you",
-                    "Thanks for watching!", "you", "the", "uh", "um"
-                ]
+                "min_text_length": 3,
+                "false_positives": []
             }
         }
         
         if os.path.exists(config_file):
             try:
                 with open(config_file, 'r') as f:
-                    return json.load(f)
+                    loaded_config = json.load(f)
+                # Merge with defaults
+                self.config = self._merge_configs(default_config, loaded_config)
+                print(f"Loaded configuration from {config_file}")
             except Exception as e:
                 print(f"Error loading config file: {e}. Using defaults.")
-                return default_config
+                self.config = default_config
         else:
             print(f"Config file not found. Using defaults.")
-            return default_config
+            self.config = default_config
+            # Save default config for reference
+            try:
+                with open(config_file, 'w') as f:
+                    json.dump(default_config, f, indent=4)
+                print(f"Created default config file: {config_file}")
+            except:
+                pass
+    
+    def _merge_configs(self, default, loaded):
+        """Recursively merge loaded config with defaults."""
+        result = default.copy()
+        for key, value in loaded.items():
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = self._merge_configs(result[key], value)
+            else:
+                result[key] = value
+        return result
     
     def toggle_listening(self):
         """Toggle the listening state."""
@@ -140,15 +145,19 @@ class SpeechToKeyboard:
     def start_audio_stream(self):
         """Start the audio input stream."""
         if self.stream is None:
-            self.stream = self.audio.open(
-                format=self.FORMAT,
-                channels=self.CHANNELS,
-                rate=self.RATE,
-                input=True,
-                frames_per_buffer=self.CHUNK,
-                stream_callback=self.audio_callback
-            )
-            self.stream.start_stream()
+            try:
+                self.stream = self.audio.open(
+                    format=self.FORMAT,
+                    channels=self.CHANNELS,
+                    rate=self.RATE,
+                    input=True,
+                    frames_per_buffer=self.CHUNK,
+                    stream_callback=self.audio_callback
+                )
+                self.stream.start_stream()
+            except Exception as e:
+                print(f"Error starting audio stream: {e}")
+                print("Please check your microphone is connected and permissions are granted.")
     
     def stop_audio_stream(self):
         """Stop the audio input stream."""
@@ -179,9 +188,8 @@ class SpeechToKeyboard:
                 self.noise_levels.append(energy)
                 return False
             
-            # Check if energy is above threshold (with some margin above noise floor)
-            energy_multiplier = self.config['speech_detection']['energy_threshold_multiplier']
-            if energy < self.energy_threshold * energy_multiplier:
+            # Check if energy is above threshold
+            if energy < self.energy_threshold * self.energy_multiplier:
                 return False
             
             # Then check with VAD
@@ -196,9 +204,7 @@ class SpeechToKeyboard:
         speech_count = 0
         is_speaking = False
         calibration_chunks = 0
-        calibration_duration = self.config['speech_detection']['calibration_duration_seconds']
-        calibration_chunks_needed = int(calibration_duration * self.RATE / self.CHUNK)
-        speech_threshold = self.config['speech_detection']['speech_detection_threshold']
+        calibration_total = int(self.calibration_seconds * self.RATE / self.CHUNK)
         
         while self.running:
             try:
@@ -208,34 +214,24 @@ class SpeechToKeyboard:
                 # Calibration phase
                 if self.calibrating:
                     calibration_chunks += 1
-                    self.calculate_energy(audio_chunk)  # Collect noise samples
+                    self.calculate_energy(audio_chunk)
                     
-                    if calibration_chunks >= calibration_chunks_needed:
+                    if calibration_chunks >= calibration_total:
                         if self.noise_levels:
                             # Set energy threshold based on noise floor
                             noise_floor = np.mean(list(self.noise_levels))
-                            noise_multiplier = self.config['speech_detection']['noise_floor_multiplier']
-                            self.energy_threshold = max(0.01, noise_floor * noise_multiplier)
-                            print(f"Calibration complete. Noise floor: {noise_floor:.4f}")
+                            self.energy_threshold = max(0.005, noise_floor * 3)
+                            print(f"Calibration complete. Noise floor: {noise_floor:.4f}, Threshold: {self.energy_threshold:.4f}")
                         self.calibrating = False
                     continue
                 
-                # Always add to pre-buffer when not speaking
-                if not is_speaking:
-                    self.pre_buffer.append(audio_chunk)
-                
                 if self.is_speech(audio_chunk):
                     speech_count += 1
-                    if not is_speaking and speech_count >= speech_threshold:
+                    if not is_speaking and speech_count >= self.consecutive_speech:
                         print("\n[Listening...]", end='', flush=True)
                         is_speaking = True
-                        # Add pre-buffer to speech frames to capture the beginning
-                        speech_frames.extend(list(self.pre_buffer))
-                        # Clear the pre-buffer
-                        self.pre_buffer.clear()
                     
-                    if is_speaking:
-                        speech_frames.append(audio_chunk)
+                    speech_frames.append(audio_chunk)
                     silence_count = 0
                 else:
                     if is_speaking:
@@ -277,24 +273,34 @@ class SpeechToKeyboard:
                 return
             
             # Transcribe with Whisper
+            whisper_config = self.config['whisper']
             result = self.model.transcribe(
                 audio_np,
-                language=self.language,
+                language=whisper_config['language'],
                 fp16=False,
-                temperature=self.config['whisper']['temperature'],
-                no_speech_threshold=self.config['whisper']['no_speech_threshold'],
-                logprob_threshold=self.config['whisper']['logprob_threshold']
+                temperature=whisper_config['temperature'],
+                no_speech_threshold=whisper_config['no_speech_threshold'],
+                logprob_threshold=whisper_config['logprob_threshold']
             )
             
             text = result['text'].strip()
             
-            # Filter out false positives using configuration
-            if text and text not in self.false_positives and len(text) > self.min_text_length:
-                print(f" [{text}]")
-                # Type the recognized text
-                self.keyboard_controller.type(text)
-            else:
-                print(" [Filtered out]")
+            # Apply filtering
+            filter_config = self.config['filtering']
+            
+            # Check against false positives
+            if text.lower() in [fp.lower() for fp in filter_config['false_positives']]:
+                print(" [Filtered: false positive]")
+                return
+            
+            # Check minimum length
+            if len(text) < filter_config['min_text_length']:
+                print(" [Filtered: too short]")
+                return
+            
+            # If all checks pass, type the text
+            print(f" [{text}]")
+            self.keyboard_controller.type(text + " ")
                 
         except Exception as e:
             print(f"\nError in recognition: {e}")
@@ -314,10 +320,19 @@ class SpeechToKeyboard:
     
     def run(self):
         """Main run loop."""
-        print("\n=== Local Speech-to-Text Keyboard ===")
+        print("\n=== Enhanced Speech-to-Text Keyboard ===")
         print("Press F9 to toggle listening on/off")
         print("Press Ctrl+C to exit")
-        print("=====================================\n")
+        print("========================================\n")
+        
+        # Show current settings
+        print("Current settings:")
+        print(f"  VAD Aggressiveness: {self.config['detection']['vad_aggressiveness']}/3")
+        print(f"  Silence threshold: {self.silence_threshold} chunks (~{self.silence_threshold * 30}ms)")
+        print(f"  Min speech duration: {self.min_speech_chunks} chunks (~{self.min_speech_chunks * 30}ms)")
+        print(f"  Model: {self.config['whisper']['model_size']}")
+        print(f"  Language: {self.config['whisper']['language']}")
+        print()
         
         # Set up hotkey listener
         hotkey_listener = self.setup_hotkeys()
@@ -338,17 +353,18 @@ class SpeechToKeyboard:
         finally:
             self.running = False
             self.stop_audio_stream()
-            if self.stream:
-                self.stream.close()
-            self.audio.terminate()
+            if self.audio:
+                self.audio.terminate()
             hotkey_listener.stop()
             print("Goodbye!")
 
 def main():
     """Main entry point."""
-    parser = argparse.ArgumentParser(description='Local Speech-to-Text Keyboard')
-    parser.add_argument('--config', default='speech_config.json',
-                        help='Path to configuration file (default: speech_config.json)')
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Enhanced Speech-to-Text Keyboard")
+    parser.add_argument("--config", default="speech_config.json", 
+                        help="Path to configuration file (default: speech_config.json)")
     args = parser.parse_args()
     
     speech_keyboard = SpeechToKeyboard(config_file=args.config)

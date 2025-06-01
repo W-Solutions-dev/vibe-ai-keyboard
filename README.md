@@ -1,8 +1,10 @@
-# Local Speech-to-Text Keyboard
+# 🎙️ Vibe AI Keyboard - Local Speech-to-Text System
+
+[![GitHub Repository](https://img.shields.io/badge/GitHub-vibe--ai--keyboard-blue)](https://github.com/W-Solutions-dev/vibe-ai-keyboard)
 
 A local, privacy-focused speech-to-text system that acts like a USB keyboard. When enabled, it listens to your speech and types the recognized text directly into any application, just as if you were typing on a physical keyboard.
 
-> **🌟 Note**: This project is 100% vibe coded with a human in the loop. Every feature is crafted through the collaborative dance between human creativity and AI assistance, ensuring both innovation and practical usability.
+> **🌟 Note**: This project is 100% vibe coded with a human in the loop. Every feature is crafted through the collaborative dance between human creativity and AI assistance, ensuring both innovation and practical usability. This project came alive through approximately 500 Claude Opus max requests, with continuous refinement and improvement planned for the future.
 
 ## Features
 
@@ -186,6 +188,24 @@ Common language codes: `en` (English), `es` (Spanish), `fr` (French), `de` (Germ
 6. **Keyboard Simulation**: Types the recognized text using pynput
 
 ## Troubleshooting
+
+### First Words Being Cut Off
+
+If you're experiencing the first words of your speech being cut off, this has been fixed with a pre-buffer system. The system now:
+
+1. **Pre-buffers audio**: Continuously stores the last ~450ms of audio before speech is detected
+2. **Instant detection**: Starts recording immediately when speech is detected
+3. **Includes pre-buffer**: Adds the pre-buffered audio to ensure no words are lost
+
+You can adjust the pre-buffer size in `speech_config.json`:
+```json
+"pre_buffer_chunks": 15  // Increase for more pre-buffer (each chunk = 30ms)
+```
+
+Test the pre-buffer behavior:
+```bash
+python test_prebuffer.py
+```
 
 ### "ALSA lib" errors
 These warnings are normal on Linux and can be ignored. The program will still work correctly.

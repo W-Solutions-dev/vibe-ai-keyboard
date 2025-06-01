@@ -1,127 +1,97 @@
-# Quick Start Guide
+# QUICKSTART - Speech-to-Text Keyboard
 
-## 🚀 Fastest Setup (3 steps)
-
-1. **Run the enhanced setup script:**
-   ```bash
-   chmod +x setup.sh
-   ./setup.sh
-   
-   # Options:
-   ./setup.sh --dry-run  # Preview what will be done
-   ./setup.sh --debug    # Show detailed logging
-   ./setup.sh --force    # Force reinstall
-   ```
-
-2. **Activate virtual environment:**
-   ```bash
-   source venv/bin/activate
-   ```
-
-3. **Run the speech keyboard:**
-   ```bash
-   python speech_to_keyboard.py
-   ```
-
-## 🧪 Testing Your Setup
-
-**Use the test helper for diagnostics:**
+## Quick Setup (Ubuntu/Debian)
 ```bash
-./test_helper.sh        # Interactive menu
-./test_helper.sh all    # Run all tests
-./test_helper.sh audio  # Test audio devices
-./test_helper.sh mic    # Test microphone
+# 1. Run setup (installs dependencies)
+./setup.sh
+
+# 2. Activate virtual environment
+source venv/bin/activate
+
+# 3. Run the program
+python speech_to_keyboard.py
 ```
 
-## 🎤 How to Use
+## Usage
+- **F9**: Toggle listening on/off
+- **Ctrl+C**: Exit program
 
-1. **Start speaking:** Press **F9** to enable listening
-2. **Stop speaking:** Press **F9** again to disable
-3. **Exit program:** Press **Ctrl+C**
+## Troubleshooting False Detections
 
-When enabled, everything you say will be typed wherever your cursor is!
+If the program is detecting breathing, keyboard sounds, or typing random text like "thank you":
 
-## 🔒 Security & Voice Commands
-
-**Basic mode (default - recommended):**
+### Option 1: Use the Enhanced Version (Recommended)
+The enhanced version has better noise filtering and is configurable:
 ```bash
-python speech_to_keyboard.py  # Text only, no commands
+python speech_to_keyboard_enhanced.py
 ```
 
-**With voice commands (use cautiously):**
+### Option 2: Adjust Sensitivity Settings
+Edit `speech_config.json` to tune detection:
+```json
+{
+    "detection": {
+        "vad_aggressiveness": 3,           // 1-3, higher = less sensitive
+        "silence_threshold_chunks": 30,     // Increase for longer pauses
+        "min_speech_chunks": 10,           // Increase to ignore short sounds
+        "energy_threshold_multiplier": 2.0, // Increase to ignore quiet sounds
+        "consecutive_speech_chunks": 5      // Increase for more strict detection
+    }
+}
+```
+
+### Option 3: Quick Fixes
+- **Too sensitive?** Increase values in `speech_config.json`
+- **Picking up breathing?** Increase `energy_threshold_multiplier` to 2.5 or 3.0
+- **False text like "thank you"?** Add to `false_positives` list in config
+
+## First Run
+- Downloads Whisper model (~140MB) on first use
+- Calibrates to your environment noise level (2 seconds)
+- ALSA warnings on Linux are normal and can be ignored
+
+## Features
+- ✅ 100% local processing (no cloud)
+- ✅ Works in any application
+- ✅ Auto-calibrates to background noise
+- ✅ Filters out breathing and keyboard sounds
+- ✅ Configurable sensitivity
+
+## Models
+- **tiny**: Fastest, less accurate
+- **base**: Default, balanced (recommended)
+- **small/medium**: Better accuracy, slower
+- **large**: Best accuracy, requires GPU
+
+## Need Commands?
+For voice commands (use with caution):
 ```bash
 python speech_to_keyboard_commands.py --enable-commands
 ```
 
-Available commands when enabled:
-- Say **"new line"** or **"press enter"**
-- Say **"copy"**, **"paste"**, **"cut"**
-- Say **"go left"**, **"go right"**, etc.
-
-⚠️ Commands are disabled by default for security. The system blocks dangerous operations like Alt+F4, system commands, etc.
-
-## 💡 Tips
-
-- **First run downloads the AI model** (~140MB)
-- **Speak clearly** and pause between sentences
-- **Works in any application** - text editors, browsers, chat apps
-- **100% offline** - no internet required after setup
-- **Check logs** - Setup creates `setup.log` for troubleshooting
-
-## 🔧 Troubleshooting
-
-**No sound?** Check microphone:
+## Quick Test
 ```bash
-./test_helper.sh mic    # Test and record audio
-arecord -l              # List audio devices
+# Test your setup
+python test_setup.py
+
+# Interactive test
+./test_helper.sh
 ```
 
-**Test all components:**
-```bash
-./test_helper.sh all    # Comprehensive test suite
-python test_setup.py    # Component verification
-```
+## Common Issues
+- **No audio detected**: Check microphone permissions
+- **High CPU usage**: Use 'tiny' model or reduce sensitivity
+- **Too many false positives**: Increase thresholds in config
+- **Missing audio**: Run `setup.sh` again
 
-**Use lightweight version** (faster, less accurate):
-```bash
-python speech_to_keyboard_lite.py
-```
+### Known Issues & Solutions
 
-**Check setup logs:**
-```bash
-./test_helper.sh logs   # View log analysis
-cat setup.log           # View full log
-```
+**First words cut off?**
+- This has been fixed! The system now uses a pre-buffer to capture ~450ms before speech detection
+- Adjust `pre_buffer_chunks` in `speech_config.json` if needed
+- Test with: `python test_prebuffer.py`
 
-## ⚡ Advanced Options
-
-**Continuous mode** (no pauses needed):
-```bash
-python speech_to_keyboard_lite.py --continuous
-```
-
-**Better accuracy** (slower):
-```bash
-# Edit speech_to_keyboard.py and change:
-model_size="small"  # or "medium"
-```
-
-**Different language:**
-```bash
-# Edit speech_to_keyboard.py and change:
-language="es"  # Spanish, "fr" French, etc.
-```
-
-**Debug mode:**
-```bash
-python speech_to_keyboard_commands.py --debug
-```
-
-## 🎯 Common Issues
-
-- **"ALSA lib" warnings:** Normal on Linux, ignore them
-- **High CPU:** Use `speech_to_keyboard_lite.py` instead
-- **Poor accuracy:** Try the "small" model or speak clearer
-- **Setup issues:** Run `./setup.sh --force` to reinstall
-
-Press F9 and start talking! 🎉 
+**False detections?**
+- Increase `energy_threshold_multiplier` in config
+- Add common false positives to the `false_positives` list
+- Use the enhanced version for better filtering 
