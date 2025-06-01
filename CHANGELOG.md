@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-01-06
+
+### Added
+- Automated issue resolution capability - AI can read GitHub issues, implement fixes, and push commits
+- Automated Development section in README documenting AI-driven development features
+- Demonstration of end-to-end automation workflow (successfully resolved issue #1)
+- GitHub API integration for issue discovery and tracking
+
+### Changed
+- Enhanced git workflow to support fully autonomous development cycle
+- PROJECT_HISTORY.md updated with automated issue resolution milestone
+
+### Fixed
+- All dates in PROJECT_HISTORY.md corrected to proper timeline
+
 ## [0.2.1] - 2025-01-21
 
 ### Added
@@ -95,11 +110,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Security` in case of vulnerabilities
 
 ## Future Releases
-
-### [0.3.0] - TBD
-- Voice UI control with screenshot analysis
-- Text-to-speech feedback system
-- GPU acceleration support
 
 ### [0.4.0] - TBD
 - PyPI package distribution
