@@ -4,28 +4,56 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
 
 # Virtual environments
 venv/
-ENV/
 env/
+ENV/
 .venv
+
+# Logs
+logs/
+*.log
+setup.log
+setup_windows.log
+
+# State files
+.setup_state
+.setup_state_windows
+
+# Audio files
+*.wav
+*.mp3
+*.m4a
+
+# Model cache
+~/.cache/whisper/
+.cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Project specific
+test_audio/
+recordings/
+
+# Windows specific
+*.exe
+*.dll
+*.bat.log
+
+# Distribution
+dist/
+build/
+*.egg-info/
 
 # IDE
 .vscode/
