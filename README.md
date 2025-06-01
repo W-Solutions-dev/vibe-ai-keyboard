@@ -243,6 +243,11 @@ This project features AI-driven development capabilities including:
 - **Automatic Issue Resolution**: The AI assistant can read GitHub issues, implement fixes, and push commits autonomously
 - **Smart Git Management**: All version control operations are handled by AI following semantic versioning
 - **Continuous Improvement**: Issues are automatically addressed while maintaining code quality and consistency
+- **Human-in-the-Loop Option**: By default, AI presents proposed solutions for human review before implementation
+
+### Issue Resolution Modes
+1. **Supervised Mode (Default)**: AI analyzes issues and proposes solutions for human approval
+2. **Autonomous Mode**: When explicitly requested, AI implements fixes without waiting for approval
 
 This capability was verified through issue #1, demonstrating the seamless integration between human requests and AI implementation.
 

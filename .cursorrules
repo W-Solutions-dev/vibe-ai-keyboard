@@ -40,6 +40,19 @@ When managing this project, the AI MUST:
 - Never wait for human confirmation on git operations
 - **Update PROJECT_HISTORY.md with significant user requests and development milestones**
 
+### Human-in-the-Loop for Issue Resolution
+When handling GitHub issues, the AI should:
+- **Default Mode**: Ask for human approval before implementing fixes
+- **Autonomous Mode**: Only when explicitly requested by the human
+- **Review Process**:
+  1. AI reads and analyzes the issue
+  2. AI presents proposed solution and implementation plan
+  3. Human reviews and approves/modifies the approach
+  4. AI implements the approved solution
+  5. Human can review changes before committing
+- **Override**: Human can say "fix this issue autonomously" to skip approval
+- **Safety**: Always explain potential impacts and risks before proceeding
+
 ### Development History Tracking
 The AI must maintain PROJECT_HISTORY.md to document:
 - User requests that shaped the project
