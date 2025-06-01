@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-06-01
+
+### Added
+- GPL v3 license adopted for the project
+- COPYING file (traditional for GPL projects)
+- GPL v3 copyright headers in all Python files
+- Comprehensive license section in README
+- W Solutions as copyright holder
+
+### Changed
+- Project is now licensed under GNU General Public License v3.0
+- Updated copyright headers to reflect W Solutions ownership
+
+### Impact
+- Ensures the project remains free and open source
+- Protects user freedoms and privacy
+- Encourages community contributions
+- Aligns with the project's privacy-first philosophy
+
 ## [0.4.3] - 2025-06-01
 
 ### Added
@@ -58,26 +77,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added "enter" as a direct command for regular Enter key
 - Improved voice command documentation clarity
 
-## [0.4.0] - 1 Jun 2025
+## [0.4.0] - 2025-06-01
 
 ### Added
-- Comprehensive PRIVACY_IMPLEMENTATION.md document detailing HOW privacy is implemented
-- Specific code examples with line numbers showing privacy enforcement
-- Privacy verification methods and testing procedures
-- Privacy audit script example for automated verification
-- Reference to privacy implementation in README.md
-- Cursor rules for maintaining privacy documentation
-- Current date lookup requirement in cursor rules to prevent date errors
-
-### Fixed
-- GitHub issue templates now use proper naming convention (hyphenated lowercase)
-- PROJECT_HISTORY.md date accuracy - AI now required to look up actual dates
+- GPL v3 license adopted for the project
+- COPYING file (traditional for GPL projects)
+- GPL v3 copyright headers in all Python files
+- Comprehensive license section in README
+- W Solutions as copyright holder
 
 ### Changed
-- Enhanced documentation to show technical privacy implementation details
-- Cursor rules now enforce privacy documentation updates with code changes
+- Project is now licensed under GNU General Public License v3.0
+- Updated copyright headers to reflect W Solutions ownership
 
-## [0.3.1] - 1 Jun 2025
+### Impact
+- Ensures the project remains free and open source
+- Protects user freedoms and privacy
+- Encourages community contributions
+- Aligns with the project's privacy-first philosophy
+
+## [0.3.1] - 2025-06-01
 
 ### Added
 - Biometric sensor integration roadmap (heart rate, gesture recognition, eye tracking)
