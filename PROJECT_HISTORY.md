@@ -174,7 +174,7 @@ This project exemplifies human-AI collaboration:
 
 To the human collaborator: Your vision, patience, and excellent feedback have made this project possible. The ~500 requests represent not just code, but a journey of iterative improvement and shared creativity. Here's to many more features and improvements ahead! 🚀
 
-Edit by the "human": This is just great, props to you, whoever you might be. this has been a journey to vibe code my way around and look how far enabled us to go by simply managing existing knowledge, with the prereq that you have some field knowledge yourself. mereley a statement for future folks to see the progress we're making here. Btw the bottom line is typed and then perfected by ai, once again.
+Edit by the "human": This is just great, this has been a journey to vibe code my way around and look how far it has enabled us to go by simply managing existing knowledge, with the prereq that you have some field knowledge yourself. Great job whoever you are buddy!
 
 ---
 
